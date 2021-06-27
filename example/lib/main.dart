@@ -31,6 +31,11 @@ class HomePage extends StatelessWidget {
       },
       child: Scaffold(
           appBar: AppBar(
+            actions: [
+              IconButton(onPressed: (){
+                // contoller.sortByName();
+              }, icon: Icon(Icons.sort),)
+            ],
             leading: IconButton(
               icon: Icon(Icons.arrow_back),
               onPressed: (){},
@@ -42,6 +47,7 @@ class HomePage extends StatelessWidget {
             child: FileManager(
               controller: controller,
               tileBuilder: (context, entity) {
+                // print(entity);
                 return Card(
                   child: ListTile(
                     leading: isFile(entity)
