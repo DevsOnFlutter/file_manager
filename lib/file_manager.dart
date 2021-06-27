@@ -4,7 +4,10 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
 
-// enum SortBy { nameA_Z, nameZ_A, creationDateN_O, dateO_N, size }
+enum SortBy {
+  name,
+  date,
+}
 
 typedef TileBuilder = Widget Function(
   BuildContext context,
@@ -22,7 +25,7 @@ bool isDirectory(FileSystemEntity entity) {
 /// Get the basename of Directory or File by providing FileSystemEntity entity.
 /// ie: controller.dirName(dir);
 String basename(FileSystemEntity entity, [bool showFileExtension = true]) {
-  return (!showFileExtension && (entity is File))
+  return (showFileExtension && (entity is File))
       ? entity.path.split('/').last.split('.').first
       : entity.path.split('/').last;
 }
@@ -99,12 +102,16 @@ class FileManager extends StatefulWidget {
   final FileManegerController controller;
   final TileBuilder tileBuilder;
 
+  /// Hide the hidden file and folder.
+  final bool hideHiddenEntity;
+
   FileManager({
     this.loadingScreen,
     this.physics,
     this.shrinkWrap = false,
     required this.controller,
     required this.tileBuilder,
+    this.hideHiddenEntity = true,
   });
 
   @override
@@ -151,13 +158,28 @@ class _FileManagerState extends State<FileManager> {
               future: Directory(pathSnapshot).list(recursive: false).toList(),
               builder: (context, snapshot) {
                 if (snapshot.hasData) {
-                  final List<FileSystemEntity> entitys = snapshot.data!;
+                  List<FileSystemEntity> entitys = snapshot.data!;
+                  entitys.sort((a, b) =>
+                      a.path.toLowerCase().compareTo(b.path.toLowerCase()));
+
+                  if (widget.hideHiddenEntity) {
+                    entitys = entitys.where((element) {
+                      if (basename(element) == "" ||
+                          basename(element).startsWith('.')) {
+                        return false;
+                      } else {
+                        print(basename(element));
+                        return true;
+                      }
+                    }).toList();
+                  }
+
                   return ListView.builder(
                     physics: widget.physics,
                     shrinkWrap: widget.shrinkWrap,
                     itemCount: entitys.length,
                     itemBuilder: (context, index) {
-                      return tileWidget(context, entitys[index]);
+                      return widget.tileBuilder(context, entitys[index]);
                     },
                   );
                 } else if (snapshot.hasError) {
@@ -170,9 +192,9 @@ class _FileManagerState extends State<FileManager> {
         },
       );
 
-  Widget tileWidget(BuildContext context, FileSystemEntity entity) {
-    return widget.tileBuilder(context, entity);
-  }
+  // Widget tileWidget(BuildContext context, FileSystemEntity entity) {
+  //   return widget.tileBuilder(context, entity);
+  // }
 
   Container errorPage(String error) {
     return Container(
