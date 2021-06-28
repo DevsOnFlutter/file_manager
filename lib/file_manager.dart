@@ -10,7 +10,7 @@ export 'package:file_manager/helper/helper.dart';
 
 typedef _Builder = Widget Function(
   BuildContext context,
-  List<FileSystemEntity> entites,
+  List<FileSystemEntity> snapshot,
 );
 
 class _PathStat {

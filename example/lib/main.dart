@@ -47,19 +47,19 @@ class HomePage extends StatelessWidget {
             margin: EdgeInsets.all(10),
             child: FileManager(
               controller: controller,
-              builder: (context, entites) {
+              builder: (context, snapshot) {
                 return ListView.builder(
-                  itemCount: entites.length,
+                  itemCount: snapshot.length,
                   itemBuilder: (context, index) {
                     return Card(
                       child: ListTile(
-                        leading: isFile(entites[index])
+                        leading: isFile(snapshot[index])
                             ? Icon(Icons.feed_outlined)
                             : Icon(Icons.folder),
-                        title: Text(basename(entites[index])),
+                        title: Text(basename(snapshot[index])),
                         onTap: () {
-                          if (isDirectory(entites[index]))
-                            controller.openDirectory(entites[index]);
+                          if (isDirectory(snapshot[index]))
+                            controller.openDirectory(snapshot[index]);
                         },
                       ),
                     );
