@@ -5,7 +5,15 @@ import 'package:flutter/material.dart';
 class FileManagerController extends ChangeNotifier {
   String _path = "";
   int _currentStorage = 0;
-  SortBy short = SortBy.name;
+  SortBy _short = SortBy.name;
+
+  // TODO: [Documentation]
+  SortBy get getSortedBy => _short;
+  // TODO: [Documentation]
+  set setSortedBy(SortBy sortType) {
+    _short = sortType;
+    notifyListeners();
+  }
 
   /// Get current directory path.
   Directory get getCurrentDirectory => Directory(_path);

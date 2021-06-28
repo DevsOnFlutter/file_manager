@@ -48,7 +48,6 @@ class HomePage extends StatelessWidget {
           body: Container(
             margin: EdgeInsets.all(10),
             child: FileManager(
-              sort: SortBy.date,
               controller: controller,
               tileBuilder: (context, entity) {
                 return Card(

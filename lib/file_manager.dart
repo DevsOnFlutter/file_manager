@@ -8,30 +8,19 @@ import 'package:path_provider/path_provider.dart';
 import 'package:file_manager/helper/helper.dart';
 export 'package:file_manager/helper/helper.dart';
 
-typedef TileBuilder = Widget Function(
+typedef _TileBuilder = Widget Function(
   BuildContext context,
   FileSystemEntity entity,
 );
 
 class _PathStat {
   final String path;
-  final FileStat fileStat;
+  final DateTime fileStat;
   _PathStat(this.path, this.fileStat);
-}
-
-List<_PathStat> _pathStat = [];
-
-bool isFile(FileSystemEntity entity) {
-  return (entity is File);
-}
-
-bool isDirectory(FileSystemEntity entity) {
-  return (entity is Directory);
 }
 
 Future<List<FileSystemEntity>> _sortEntitysList(
     String path, SortBy sortType) async {
-  _pathStat.clear();
   final List<FileSystemEntity> list = await Directory(path).list().toList();
   if (sortType == SortBy.name) {
     final dirs = list.where((element) => element is Directory).toList();
@@ -40,15 +29,34 @@ Future<List<FileSystemEntity>> _sortEntitysList(
     files.sort((a, b) => a.path.toLowerCase().compareTo(b.path.toLowerCase()));
     return [...dirs, ...files];
   } else if (sortType == SortBy.date) {
+    List<_PathStat> _pathStat = [];
     for (FileSystemEntity e in list) {
-      _pathStat.add(_PathStat(e.path, (await e.stat())));
+      _pathStat.add(_PathStat(e.path, (await e.stat()).modified));
     }
     list.sort((a, b) => _pathStat
         .indexWhere((element) => element.path == a.path)
         .compareTo(_pathStat.indexWhere((element) => element.path == b.path)));
     return list;
+  } else if (sortType == SortBy.type) {
+    final dirs = list.where((element) => element is Directory).toList();
+    dirs.sort((a, b) => a.path.toLowerCase().compareTo(b.path.toLowerCase()));
+    final files = list.where((element) => element is File).toList();
+    files.sort((a, b) => a.path
+        .toLowerCase()
+        .split('.')
+        .last
+        .compareTo(b.path.toLowerCase().split('.').last));
+    return [...dirs, ...files];
   }
   return [];
+}
+
+bool isFile(FileSystemEntity entity) {
+  return (entity is File);
+}
+
+bool isDirectory(FileSystemEntity entity) {
+  return (entity is Directory);
 }
 
 /// Get the basename of Directory or File.
@@ -87,8 +95,7 @@ class FileManager extends StatefulWidget {
   final ScrollPhysics? physics;
   final bool shrinkWrap;
   final FileManagerController controller;
-  final SortBy sort;
-  final TileBuilder tileBuilder;
+  final _TileBuilder tileBuilder;
 
   /// Hide the hidden file and folder.
   final bool hideHiddenEntity;
@@ -97,7 +104,6 @@ class FileManager extends StatefulWidget {
     this.loadingScreen,
     this.physics,
     this.shrinkWrap = false,
-    this.sort = SortBy.name,
     required this.controller,
     required this.tileBuilder,
     this.hideHiddenEntity = true,
@@ -109,12 +115,15 @@ class FileManager extends StatefulWidget {
 
 class _FileManagerState extends State<FileManager> {
   final ValueNotifier<String> path = ValueNotifier<String>("");
+  final ValueNotifier<SortBy> sort = ValueNotifier<SortBy>(SortBy.name);
 
   @override
   void initState() {
     super.initState();
-    widget.controller
-        .addListener(() => path.value = widget.controller.getCurrentPath);
+    widget.controller.addListener(() {
+      path.value = widget.controller.getCurrentPath;
+      sort.value = widget.controller.getSortedBy;
+    });
   }
 
   @override
@@ -124,12 +133,9 @@ class _FileManagerState extends State<FileManager> {
       builder: (context, snapshot) {
         if (snapshot.hasData) {
           widget.controller.setCurrentPath = snapshot.data![0].path;
-          // path.value = snapshot.data![0].path;
           return body(context);
         } else if (snapshot.hasError) {
-          // print(snapshot.error);
           throw Exception(snapshot.error.toString());
-          // return errorPage(snapshot.error.toString());
         } else {
           return loadingScreenWidget();
         }
@@ -141,46 +147,43 @@ class _FileManagerState extends State<FileManager> {
     return ValueListenableBuilder<String>(
       valueListenable: path,
       builder: (context, pathSnapshot, _) {
-        return FutureBuilder<List<FileSystemEntity>>(
-            // future: Directory(pathSnapshot).list(recursive: false).toList(),
-            future: _sortEntitysList(pathSnapshot, widget.sort),
-            builder: (context, snapshot) {
-              if (snapshot.hasData) {
-                List<FileSystemEntity> entitys = snapshot.data!;
-
-                if (widget.hideHiddenEntity) {
-                  entitys = entitys.where((element) {
-                    if (basename(element) == "" ||
-                        basename(element).startsWith('.')) {
-                      return false;
+        return ValueListenableBuilder<SortBy>(
+            valueListenable: sort,
+            builder: (context, snapshot, _) {
+              return FutureBuilder<List<FileSystemEntity>>(
+                  future: _sortEntitysList(pathSnapshot, sort.value),
+                  builder: (context, snapshot) {
+                    if (snapshot.hasData) {
+                      List<FileSystemEntity> entitys = snapshot.data!;
+                      if (widget.hideHiddenEntity) {
+                        entitys = entitys.where((element) {
+                          if (basename(element) == "" ||
+                              basename(element).startsWith('.')) {
+                            return false;
+                          } else {
+                            return true;
+                          }
+                        }).toList();
+                      }
+                      return ListView.builder(
+                        physics: widget.physics,
+                        shrinkWrap: widget.shrinkWrap,
+                        itemCount: entitys.length,
+                        itemBuilder: (context, index) {
+                          return widget.tileBuilder(context, entitys[index]);
+                        },
+                      );  // TODO: [Documentation]
+                    } else if (snapshot.hasError) {
+                      print(snapshot.error);
+                      return errorPage(snapshot.error.toString());
                     } else {
-                      return true;
+                      return loadingScreenWidget();
                     }
-                  }).toList();
-                }
-
-                return ListView.builder(
-                  physics: widget.physics,
-                  shrinkWrap: widget.shrinkWrap,
-                  itemCount: entitys.length,
-                  itemBuilder: (context, index) {
-                    return widget.tileBuilder(context, entitys[index]);
-                  },
-                );
-              } else if (snapshot.hasError) {
-                print(snapshot.error);
-                return errorPage(snapshot.error.toString());
-              } else {
-                return loadingScreenWidget();
-              }
+                  });
             });
       },
     );
   }
-
-  // Widget tileWidget(BuildContext context, FileSystemEntity entity) {
-  //   return widget.tileBuilder(context, entity);
-  // }
 
   Container errorPage(String error) {
     return Container(
