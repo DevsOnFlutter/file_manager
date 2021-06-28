@@ -21,7 +21,7 @@ class _MyAppState extends State<MyApp> {
 }
 
 class HomePage extends StatelessWidget {
-  final FileManegerController controller = FileManegerController();
+  final FileManagerController controller = FileManagerController();
 
   @override
   Widget build(BuildContext context) {
@@ -32,16 +32,18 @@ class HomePage extends StatelessWidget {
       child: Scaffold(
           appBar: AppBar(
             actions: [
-              IconButton(onPressed: (){
-                // contoller.sortByName();
-              }, icon: Icon(Icons.sort),)
+              IconButton(
+                onPressed: () {
+                  // contoller.sortByName();
+                },
+                icon: Icon(Icons.sort),
+              )
             ],
             leading: IconButton(
               icon: Icon(Icons.arrow_back),
-              onPressed: (){},
+              onPressed: () {},
             ),
           ),
-          
           body: Container(
             margin: EdgeInsets.all(10),
             child: FileManager(

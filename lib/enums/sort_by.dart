@@ -1,0 +1,4 @@
+enum SortBy {
+  name,
+  date,
+}
