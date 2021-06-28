@@ -13,13 +13,13 @@ typedef TileBuilder = Widget Function(
   FileSystemEntity entity,
 );
 
-class _PathInfo {
+class _PathStat {
   final String path;
   final FileStat fileStat;
-  _PathInfo(this.path, this.fileStat);
+  _PathStat(this.path, this.fileStat);
 }
 
-List<_PathInfo> _pathInfo = [];
+List<_PathStat> _pathStat = [];
 
 bool isFile(FileSystemEntity entity) {
   return (entity is File);
@@ -31,7 +31,7 @@ bool isDirectory(FileSystemEntity entity) {
 
 Future<List<FileSystemEntity>> _sortEntitysList(
     String path, SortBy sortType) async {
-  _pathInfo.clear();
+  _pathStat.clear();
   final List<FileSystemEntity> list = await Directory(path).list().toList();
   if (sortType == SortBy.name) {
     final dirs = list.where((element) => element is Directory).toList();
@@ -40,11 +40,13 @@ Future<List<FileSystemEntity>> _sortEntitysList(
     files.sort((a, b) => a.path.toLowerCase().compareTo(b.path.toLowerCase()));
     return [...dirs, ...files];
   } else if (sortType == SortBy.date) {
-    // list.forEach((element) async =>
-    //     _pathInfo.add(_PathInfo(element.path, await element.stat())));
-    // final dirs = list.where((element) => element is Directory).toList();
-    // dirs.sort((a, b) => a.path.toLowerCase().compareTo(b.path.toLowerCase()));
-    // final files = list.where((element) => element is File).toList();
+    for (FileSystemEntity e in list) {
+      _pathStat.add(_PathStat(e.path, (await e.stat())));
+    }
+    list.sort((a, b) => _pathStat
+        .indexWhere((element) => element.path == a.path)
+        .compareTo(_pathStat.indexWhere((element) => element.path == b.path)));
+    return list;
   }
   return [];
 }
@@ -64,15 +66,6 @@ String basename(dynamic entity, [bool showFileExtension = true]) {
     return "";
   }
 }
-
-// /// Get the basename of Directory by providing Directory.
-// String basenameDir(Directory dir) => dir.path.split('/').last;
-
-// /// Get the basename of Fileby providing File.
-// String basenameFle(File file, {bool showFileExtension = false}) =>
-//     showFileExtension
-//         ? file.path.split('/').last
-//         : file.path.split('/').last.split('.').first;
 
 Future<List<Directory>?> getStorageList() async {
   List<Directory>? storages = await getExternalStorageDirectories();
