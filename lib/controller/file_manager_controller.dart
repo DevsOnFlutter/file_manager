@@ -31,13 +31,13 @@ class FileManagerController extends ChangeNotifier {
     return willNotGoToParent;
   }
 
-  List<FileSystemEntity> sort(SortBy sort, List<FileSystemEntity> entitys) {
-    if (sort == SortBy.name) {
-      entitys
-          .sort((a, b) => a.path.toLowerCase().compareTo(b.path.toLowerCase()));
-      return entitys;
-    } else if (sort == SortBy.date) {}
-  }
+  // List<FileSystemEntity> sort(SortBy sort, List<FileSystemEntity> entitys) {
+  //   if (sort == SortBy.name) {
+  //     entitys
+  //         .sort((a, b) => a.path.toLowerCase().compareTo(b.path.toLowerCase()));
+  //     return entitys;
+  //   } else if (sort == SortBy.date) {}
+  // }
 
   /// Open directory by providing Directory.
   void openDirectory(FileSystemEntity entity) {
