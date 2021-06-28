@@ -95,13 +95,13 @@ class _FileManagerState extends State<FileManager> {
     return FutureBuilder<List<Directory>?>(
       future: getStorageList(),
       builder: (context, snapshot) {
-        print(snapshot.data);
         if (snapshot.hasData) {
           path.value = snapshot.data![0].path;
           return body(context);
         } else if (snapshot.hasError) {
-          print(snapshot.error);
-          return errorPage(snapshot.error.toString());
+          // print(snapshot.error);
+          throw Exception(snapshot.error.toString());
+          // return errorPage(snapshot.error.toString());
         } else {
           return loadingScreenWidget();
         }

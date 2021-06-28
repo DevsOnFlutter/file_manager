@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:file_manager/file_manager.dart';
 import 'package:flutter/material.dart';
 
 class FileManagerController extends ChangeNotifier {
@@ -16,6 +17,18 @@ class FileManagerController extends ChangeNotifier {
   set setCurrentPath(String path) {
     _path = path;
     notifyListeners();
+  }
+
+  Future<bool> goToParentDirectory() async {
+    List<Directory> storageList = (await getStorageList())!;
+    bool willNotGoToParent = storageList
+        .where((element) => element.path == Directory(_path).path)
+        .isEmpty;
+    print(Directory(_path).parent);
+    if (!willNotGoToParent) {
+      openDirectory(Directory(_path).parent);
+    }
+    return willNotGoToParent;
   }
 
   /// Open directory by providing Directory.

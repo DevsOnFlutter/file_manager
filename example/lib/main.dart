@@ -27,7 +27,7 @@ class HomePage extends StatelessWidget {
   Widget build(BuildContext context) {
     return WillPopScope(
       onWillPop: () async {
-        return true;
+        return await controller.goToParentDirectory();
       },
       child: Scaffold(
           appBar: AppBar(
@@ -41,7 +41,11 @@ class HomePage extends StatelessWidget {
             ],
             leading: IconButton(
               icon: Icon(Icons.arrow_back),
-              onPressed: () {},
+              onPressed: () async {
+                if (!(await controller.goToParentDirectory())) {
+                  Navigator.pop(context);
+                }
+              },
             ),
           ),
           body: Container(
