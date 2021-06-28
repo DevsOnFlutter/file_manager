@@ -96,7 +96,8 @@ class _FileManagerState extends State<FileManager> {
       future: getStorageList(),
       builder: (context, snapshot) {
         if (snapshot.hasData) {
-          path.value = snapshot.data![0].path;
+          widget.controller.setCurrentPath = snapshot.data![0].path;
+          // path.value = snapshot.data![0].path;
           return body(context);
         } else if (snapshot.hasError) {
           // print(snapshot.error);
@@ -127,7 +128,6 @@ class _FileManagerState extends State<FileManager> {
                         basename(element).startsWith('.')) {
                       return false;
                     } else {
-                      print(basename(element));
                       return true;
                     }
                   }).toList();

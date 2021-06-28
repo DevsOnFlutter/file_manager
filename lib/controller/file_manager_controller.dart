@@ -21,14 +21,16 @@ class FileManagerController extends ChangeNotifier {
 
   Future<bool> goToParentDirectory() async {
     List<Directory> storageList = (await getStorageList())!;
-    bool willNotGoToParent = storageList
-        .where((element) => element.path == Directory(_path).path)
-        .isEmpty;
-    print(Directory(_path).parent);
-    if (!willNotGoToParent) {
-      openDirectory(Directory(_path).parent);
-    }
+    final bool willNotGoToParent = (storageList.where((element) {
+      print("${element.path} == ${Directory(_path).path}");
+      return element.path == Directory(_path).path;
+    }).isNotEmpty);
+    if (!willNotGoToParent) openDirectory(Directory(_path).parent);
     return willNotGoToParent;
+  }
+
+  Future<bool> willPopScopeControll() async {
+    return await goToParentDirectory();
   }
 
   // List<FileSystemEntity> sort(SortBy sort, List<FileSystemEntity> entitys) {

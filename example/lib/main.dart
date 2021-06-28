@@ -26,9 +26,7 @@ class HomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return WillPopScope(
-      onWillPop: () async {
-        return await controller.goToParentDirectory();
-      },
+      onWillPop: controller.willPopScopeControll,
       child: Scaffold(
           appBar: AppBar(
             actions: [
@@ -42,9 +40,8 @@ class HomePage extends StatelessWidget {
             leading: IconButton(
               icon: Icon(Icons.arrow_back),
               onPressed: () async {
-                if (!(await controller.goToParentDirectory())) {
-                  Navigator.pop(context);
-                }
+                final bool k = await controller.goToParentDirectory();
+                print(k);
               },
             ),
           ),
