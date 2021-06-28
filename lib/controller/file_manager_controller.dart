@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 class FileManagerController extends ChangeNotifier {
   String _path = "";
   int _currentStorage = 0;
+  SortBy short = SortBy.name;
 
   /// Get current directory path.
   Directory get getCurrentDirectory => Directory(_path);
@@ -31,13 +32,9 @@ class FileManagerController extends ChangeNotifier {
     return await goToParentDirectory();
   }
 
-  // List<FileSystemEntity> sort(SortBy sort, List<FileSystemEntity> entitys) {
-  //   if (sort == SortBy.name) {
-  //     entitys
-  //         .sort((a, b) => a.path.toLowerCase().compareTo(b.path.toLowerCase()));
-  //     return entitys;
-  //   } else if (sort == SortBy.date) {}
-  // }
+  Future<void> sortBy(SortBy sortType) async {
+    if (sortType == SortBy.name) {}
+  }
 
   /// Open directory by providing Directory.
   void openDirectory(FileSystemEntity entity) {

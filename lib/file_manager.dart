@@ -13,14 +13,40 @@ typedef TileBuilder = Widget Function(
   FileSystemEntity entity,
 );
 
+class _PathInfo {
+  final String path;
+  final FileStat fileStat;
+  _PathInfo(this.path, this.fileStat);
+}
+
+List<_PathInfo> _pathInfo = [];
+
 bool isFile(FileSystemEntity entity) {
   return (entity is File);
 }
 
-dirRename(FileSystemEntity dir, String name) {}
-
 bool isDirectory(FileSystemEntity entity) {
   return (entity is Directory);
+}
+
+Future<List<FileSystemEntity>> _sortEntitysList(
+    String path, SortBy sortType) async {
+  _pathInfo.clear();
+  final List<FileSystemEntity> list = await Directory(path).list().toList();
+  if (sortType == SortBy.name) {
+    final dirs = list.where((element) => element is Directory).toList();
+    dirs.sort((a, b) => a.path.toLowerCase().compareTo(b.path.toLowerCase()));
+    final files = list.where((element) => element is File).toList();
+    files.sort((a, b) => a.path.toLowerCase().compareTo(b.path.toLowerCase()));
+    return [...dirs, ...files];
+  } else if (sortType == SortBy.date) {
+    // list.forEach((element) async =>
+    //     _pathInfo.add(_PathInfo(element.path, await element.stat())));
+    // final dirs = list.where((element) => element is Directory).toList();
+    // dirs.sort((a, b) => a.path.toLowerCase().compareTo(b.path.toLowerCase()));
+    // final files = list.where((element) => element is File).toList();
+  }
+  return [];
 }
 
 /// Get the basename of Directory or File.
@@ -68,6 +94,7 @@ class FileManager extends StatefulWidget {
   final ScrollPhysics? physics;
   final bool shrinkWrap;
   final FileManagerController controller;
+  final SortBy sort;
   final TileBuilder tileBuilder;
 
   /// Hide the hidden file and folder.
@@ -77,6 +104,7 @@ class FileManager extends StatefulWidget {
     this.loadingScreen,
     this.physics,
     this.shrinkWrap = false,
+    this.sort = SortBy.name,
     required this.controller,
     required this.tileBuilder,
     this.hideHiddenEntity = true,
@@ -121,12 +149,11 @@ class _FileManagerState extends State<FileManager> {
       valueListenable: path,
       builder: (context, pathSnapshot, _) {
         return FutureBuilder<List<FileSystemEntity>>(
-            future: Directory(pathSnapshot).list(recursive: false).toList(),
+            // future: Directory(pathSnapshot).list(recursive: false).toList(),
+            future: _sortEntitysList(pathSnapshot, widget.sort),
             builder: (context, snapshot) {
               if (snapshot.hasData) {
                 List<FileSystemEntity> entitys = snapshot.data!;
-                entitys.sort((a, b) =>
-                    a.path.toLowerCase().compareTo(b.path.toLowerCase()));
 
                 if (widget.hideHiddenEntity) {
                   entitys = entitys.where((element) {

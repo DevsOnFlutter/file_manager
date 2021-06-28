@@ -39,6 +39,7 @@ class HomePage extends StatelessWidget {
             leading: IconButton(
               icon: Icon(Icons.arrow_back),
               onPressed: () async {
+                
                 final bool k = await controller.goToParentDirectory();
                 print(k);
               },
