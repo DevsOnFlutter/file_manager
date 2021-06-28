@@ -27,6 +27,7 @@ class FileManagerController extends ChangeNotifier {
     notifyListeners();
   }
 
+  // TODO: [Documentation]
   Future<bool> goToParentDirectory() async {
     List<Directory> storageList = (await getStorageList())!;
     final bool willNotGoToParent = (storageList
@@ -34,14 +35,6 @@ class FileManagerController extends ChangeNotifier {
         .isNotEmpty);
     if (!willNotGoToParent) openDirectory(Directory(_path).parent);
     return willNotGoToParent;
-  }
-
-  Future<bool> willPopScopeControll() async {
-    return await goToParentDirectory();
-  }
-
-  Future<void> sortBy(SortBy sortType) async {
-    if (sortType == SortBy.name) {}
   }
 
   /// Open directory by providing Directory.
@@ -63,9 +56,5 @@ class FileManagerController extends ChangeNotifier {
     _currentStorage = strageIndex;
     _path = (await getStorageList())![strageIndex].path;
     notifyListeners();
-  }
-
-  bool handleWillPopScope() {
-    return false;
   }
 }

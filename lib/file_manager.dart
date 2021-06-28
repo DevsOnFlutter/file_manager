@@ -8,9 +8,9 @@ import 'package:path_provider/path_provider.dart';
 import 'package:file_manager/helper/helper.dart';
 export 'package:file_manager/helper/helper.dart';
 
-typedef _TileBuilder = Widget Function(
+typedef _Builder = Widget Function(
   BuildContext context,
-  FileSystemEntity entity,
+  List<FileSystemEntity> entites,
 );
 
 class _PathStat {
@@ -95,7 +95,7 @@ class FileManager extends StatefulWidget {
   final ScrollPhysics? physics;
   final bool shrinkWrap;
   final FileManagerController controller;
-  final _TileBuilder tileBuilder;
+  final _Builder builder;
 
   /// Hide the hidden file and folder.
   final bool hideHiddenEntity;
@@ -105,7 +105,7 @@ class FileManager extends StatefulWidget {
     this.physics,
     this.shrinkWrap = false,
     required this.controller,
-    required this.tileBuilder,
+    required this.builder,
     this.hideHiddenEntity = true,
   });
 
@@ -165,14 +165,7 @@ class _FileManagerState extends State<FileManager> {
                           }
                         }).toList();
                       }
-                      return ListView.builder(
-                        physics: widget.physics,
-                        shrinkWrap: widget.shrinkWrap,
-                        itemCount: entitys.length,
-                        itemBuilder: (context, index) {
-                          return widget.tileBuilder(context, entitys[index]);
-                        },
-                      );  // TODO: [Documentation]
+                      return widget.builder(context, entitys);
                     } else if (snapshot.hasError) {
                       print(snapshot.error);
                       return errorPage(snapshot.error.toString());

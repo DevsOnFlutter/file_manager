@@ -27,7 +27,7 @@ class HomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return WillPopScope(
-      onWillPop: controller.willPopScopeControll,
+      onWillPop: () async => (await controller.goToParentDirectory()),
       child: Scaffold(
           appBar: AppBar(
             actions: [
@@ -39,9 +39,7 @@ class HomePage extends StatelessWidget {
             leading: IconButton(
               icon: Icon(Icons.arrow_back),
               onPressed: () async {
-                
-                final bool k = await controller.goToParentDirectory();
-                print(k);
+                await controller.goToParentDirectory();
               },
             ),
           ),
@@ -49,17 +47,23 @@ class HomePage extends StatelessWidget {
             margin: EdgeInsets.all(10),
             child: FileManager(
               controller: controller,
-              tileBuilder: (context, entity) {
-                return Card(
-                  child: ListTile(
-                    leading: isFile(entity)
-                        ? Icon(Icons.feed_outlined)
-                        : Icon(Icons.folder),
-                    title: Text(basename(entity, false)),
-                    onTap: () {
-                      if (isDirectory(entity)) controller.openDirectory(entity);
-                    },
-                  ),
+              builder: (context, entites) {
+                return ListView.builder(
+                  itemCount: entites.length,
+                  itemBuilder: (context, index) {
+                    return Card(
+                      child: ListTile(
+                        leading: isFile(entites[index])
+                            ? Icon(Icons.feed_outlined)
+                            : Icon(Icons.folder),
+                        title: Text(basename(entites[index])),
+                        onTap: () {
+                          if (isDirectory(entites[index]))
+                            controller.openDirectory(entites[index]);
+                        },
+                      ),
+                    );
+                  },
                 );
               },
             ),
