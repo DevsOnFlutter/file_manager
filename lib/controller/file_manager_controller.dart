@@ -1,5 +1,4 @@
 import 'dart:io';
-
 import 'package:file_manager/file_manager.dart';
 import 'package:flutter/material.dart';
 
@@ -21,10 +20,9 @@ class FileManagerController extends ChangeNotifier {
 
   Future<bool> goToParentDirectory() async {
     List<Directory> storageList = (await getStorageList())!;
-    final bool willNotGoToParent = (storageList.where((element) {
-      print("${element.path} == ${Directory(_path).path}");
-      return element.path == Directory(_path).path;
-    }).isNotEmpty);
+    final bool willNotGoToParent = (storageList
+        .where((element) => element.path == Directory(_path).path)
+        .isNotEmpty);
     if (!willNotGoToParent) openDirectory(Directory(_path).parent);
     return willNotGoToParent;
   }
@@ -56,8 +54,9 @@ class FileManagerController extends ChangeNotifier {
   int get getCurrentStorage => _currentStorage;
 
   /// Set current storege. ie: 0 is for internal storage. 1, 2 and so on, if any external storage is available.
-  set setCurrentStorage(int index) {
-    _currentStorage = index;
+  Future<void> setCurrentStorage({required int strageIndex}) async {
+    _currentStorage = strageIndex;
+    _path = (await getStorageList())![strageIndex].path;
     notifyListeners();
   }
 

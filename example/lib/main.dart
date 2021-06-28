@@ -15,6 +15,7 @@ class _MyAppState extends State<MyApp> {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
+      theme: ThemeData(brightness: Brightness.dark),
       home: HomePage(),
     );
   }
@@ -31,10 +32,8 @@ class HomePage extends StatelessWidget {
           appBar: AppBar(
             actions: [
               IconButton(
-                onPressed: () {
-                  // contoller.sortByName();
-                },
-                icon: Icon(Icons.sort),
+                onPressed: () => controller.setCurrentStorage(strageIndex: 1),
+                icon: Icon(Icons.sd_storage_rounded),
               )
             ],
             leading: IconButton(
@@ -50,7 +49,6 @@ class HomePage extends StatelessWidget {
             child: FileManager(
               controller: controller,
               tileBuilder: (context, entity) {
-                // print(entity);
                 return Card(
                   child: ListTile(
                     leading: isFile(entity)

@@ -17,26 +17,36 @@ bool isFile(FileSystemEntity entity) {
   return (entity is File);
 }
 
+dirRename(FileSystemEntity dir, String name) {}
+
 bool isDirectory(FileSystemEntity entity) {
   return (entity is Directory);
 }
 
-/// Get the basename of Directory or File by providing FileSystemEntity entity.
+/// Get the basename of Directory or File.
 /// ie: controller.dirName(dir);
-String basename(FileSystemEntity entity, [bool showFileExtension = true]) {
-  return (showFileExtension && (entity is File))
-      ? entity.path.split('/').last.split('.').first
-      : entity.path.split('/').last;
+String basename(dynamic entity, [bool showFileExtension = true]) {
+  if (entity is Directory) {
+    return entity.path.split('/').last;
+  } else if (entity is File) {
+    return (showFileExtension)
+        ? entity.path.split('/').last.split('.').first
+        : entity.path.split('/').last;
+  } else {
+    print(
+        "Please provide a Object of type File, Directory or FileSystemEntity");
+    return "";
+  }
 }
 
-/// Get the basename of Directory by providing Directory.
-String basenameDir(Directory dir) => dir.path.split('/').last;
+// /// Get the basename of Directory by providing Directory.
+// String basenameDir(Directory dir) => dir.path.split('/').last;
 
-/// Get the basename of Fileby providing File.
-String basenameFle(File file, {bool showFileExtension = false}) =>
-    showFileExtension
-        ? file.path.split('/').last
-        : file.path.split('/').last.split('.').first;
+// /// Get the basename of Fileby providing File.
+// String basenameFle(File file, {bool showFileExtension = false}) =>
+//     showFileExtension
+//         ? file.path.split('/').last
+//         : file.path.split('/').last.split('.').first;
 
 Future<List<Directory>?> getStorageList() async {
   List<Directory>? storages = await getExternalStorageDirectories();
@@ -78,16 +88,12 @@ class FileManager extends StatefulWidget {
 
 class _FileManagerState extends State<FileManager> {
   final ValueNotifier<String> path = ValueNotifier<String>("");
-  final ValueNotifier<int> currentStorage = ValueNotifier<int>(0);
 
   @override
   void initState() {
     super.initState();
-
-    widget.controller.addListener(() {
-      path.value = widget.controller.getCurrentPath;
-      currentStorage.value = widget.controller.getCurrentStorage;
-    });
+    widget.controller
+        .addListener(() => path.value = widget.controller.getCurrentPath);
   }
 
   @override
