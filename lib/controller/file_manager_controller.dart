@@ -1,11 +1,19 @@
 import 'dart:io';
-
 import 'package:file_manager/file_manager.dart';
 import 'package:flutter/material.dart';
 
 class FileManagerController extends ChangeNotifier {
   String _path = "";
   int _currentStorage = 0;
+  SortBy _short = SortBy.size;
+
+  // TODO: [Documentation]
+  SortBy get getSortedBy => _short;
+  // TODO: [Documentation]
+  set setSortedBy(SortBy sortType) {
+    _short = sortType;
+    notifyListeners();
+  }
 
   /// Get current directory path.
   Directory get getCurrentDirectory => Directory(_path);
@@ -19,25 +27,15 @@ class FileManagerController extends ChangeNotifier {
     notifyListeners();
   }
 
+  // TODO: [Documentation]
   Future<bool> goToParentDirectory() async {
     List<Directory> storageList = (await getStorageList())!;
-    bool willNotGoToParent = storageList
+    final bool willNotGoToParent = (storageList
         .where((element) => element.path == Directory(_path).path)
-        .isEmpty;
-    print(Directory(_path).parent);
-    if (!willNotGoToParent) {
-      openDirectory(Directory(_path).parent);
-    }
+        .isNotEmpty);
+    if (!willNotGoToParent) openDirectory(Directory(_path).parent);
     return willNotGoToParent;
   }
-
-  // List<FileSystemEntity> sort(SortBy sort, List<FileSystemEntity> entitys) {
-  //   if (sort == SortBy.name) {
-  //     entitys
-  //         .sort((a, b) => a.path.toLowerCase().compareTo(b.path.toLowerCase()));
-  //     return entitys;
-  //   } else if (sort == SortBy.date) {}
-  // }
 
   /// Open directory by providing Directory.
   void openDirectory(FileSystemEntity entity) {
@@ -54,12 +52,9 @@ class FileManagerController extends ChangeNotifier {
   int get getCurrentStorage => _currentStorage;
 
   /// Set current storege. ie: 0 is for internal storage. 1, 2 and so on, if any external storage is available.
-  set setCurrentStorage(int index) {
-    _currentStorage = index;
+  Future<void> setCurrentStorage({required int strageIndex}) async {
+    _currentStorage = strageIndex;
+    _path = (await getStorageList())![strageIndex].path;
     notifyListeners();
-  }
-
-  bool handleWillPopScope() {
-    return false;
   }
 }

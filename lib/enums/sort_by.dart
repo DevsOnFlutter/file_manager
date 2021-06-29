@@ -1,4 +1,1 @@
-enum SortBy {
-  name,
-  date,
-}
+enum SortBy { name, type, date, size }

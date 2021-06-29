@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:file_manager/file_manager.dart';
 import 'package:flutter/material.dart';
 
@@ -15,6 +17,7 @@ class _MyAppState extends State<MyApp> {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
+      theme: ThemeData(brightness: Brightness.dark),
       home: HomePage(),
     );
   }
@@ -26,25 +29,19 @@ class HomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return WillPopScope(
-      onWillPop: () async {
-        return await controller.goToParentDirectory();
-      },
+      onWillPop: () async => (await controller.goToParentDirectory()),
       child: Scaffold(
           appBar: AppBar(
             actions: [
               IconButton(
-                onPressed: () {
-                  // contoller.sortByName();
-                },
-                icon: Icon(Icons.sort),
+                onPressed: () => controller.setCurrentStorage(strageIndex: 1),
+                icon: Icon(Icons.sd_storage_rounded),
               )
             ],
             leading: IconButton(
               icon: Icon(Icons.arrow_back),
               onPressed: () async {
-                if (!(await controller.goToParentDirectory())) {
-                  Navigator.pop(context);
-                }
+                await controller.goToParentDirectory();
               },
             ),
           ),
@@ -52,18 +49,23 @@ class HomePage extends StatelessWidget {
             margin: EdgeInsets.all(10),
             child: FileManager(
               controller: controller,
-              tileBuilder: (context, entity) {
-                // print(entity);
-                return Card(
-                  child: ListTile(
-                    leading: isFile(entity)
-                        ? Icon(Icons.feed_outlined)
-                        : Icon(Icons.folder),
-                    title: Text(basename(entity, false)),
-                    onTap: () {
-                      if (isDirectory(entity)) controller.openDirectory(entity);
-                    },
-                  ),
+              builder: (context, snapshot) {
+                return ListView.builder(
+                  itemCount: snapshot.length,
+                  itemBuilder: (context, index) {
+                    return Card(
+                      child: ListTile(
+                        leading: isFile(snapshot[index])
+                            ? Icon(Icons.feed_outlined)
+                            : Icon(Icons.folder),
+                        title: Text(basename(snapshot[index])),
+                        onTap: () {
+                          if (isDirectory(snapshot[index]))
+                            controller.openDirectory(snapshot[index]);
+                        },
+                      ),
+                    );
+                  },
                 );
               },
             ),
