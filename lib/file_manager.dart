@@ -15,32 +15,52 @@ typedef _Builder = Widget Function(
 
 class _PathStat {
   final String path;
-  final DateTime fileStat;
-  _PathStat(this.path, this.fileStat);
+  final DateTime dateTime;
+  _PathStat(this.path, this.dateTime);
 }
 
 Future<List<FileSystemEntity>> _sortEntitysList(
     String path, SortBy sortType) async {
   final List<FileSystemEntity> list = await Directory(path).list().toList();
   if (sortType == SortBy.name) {
+    // making list of only folders.
     final dirs = list.where((element) => element is Directory).toList();
+    // sorting folder list by name.
     dirs.sort((a, b) => a.path.toLowerCase().compareTo(b.path.toLowerCase()));
+
+    // making list of only flies.
     final files = list.where((element) => element is File).toList();
+    // sorting files list by name.
     files.sort((a, b) => a.path.toLowerCase().compareTo(b.path.toLowerCase()));
+
+    // first folders will go to list (if available) then files will go to list.
     return [...dirs, ...files];
   } else if (sortType == SortBy.date) {
+    // making the list of Path & DateTime
     List<_PathStat> _pathStat = [];
     for (FileSystemEntity e in list) {
       _pathStat.add(_PathStat(e.path, (await e.stat()).modified));
     }
+
+    // sort _pathStat according to date
+    _pathStat.sort((b, a) => a.dateTime.compareTo(b.dateTime));
+
+    // sorting [list] accroding to [_pathStat]
     list.sort((a, b) => _pathStat
         .indexWhere((element) => element.path == a.path)
         .compareTo(_pathStat.indexWhere((element) => element.path == b.path)));
     return list;
   } else if (sortType == SortBy.type) {
+    // making list of only folders.
     final dirs = list.where((element) => element is Directory).toList();
+
+    // sorting folders by name.
     dirs.sort((a, b) => a.path.toLowerCase().compareTo(b.path.toLowerCase()));
+
+    // making the list of files
     final files = list.where((element) => element is File).toList();
+
+    // sorting files list by extension.
     files.sort((a, b) => a.path
         .toLowerCase()
         .split('.')
@@ -51,10 +71,12 @@ Future<List<FileSystemEntity>> _sortEntitysList(
   return [];
 }
 
+// check weather FileSystemEntity is Fille
 bool isFile(FileSystemEntity entity) {
   return (entity is File);
 }
 
+// check weather FileSystemEntity is Directory
 bool isDirectory(FileSystemEntity entity) {
   return (entity is Directory);
 }
@@ -75,18 +97,23 @@ String basename(dynamic entity, [bool showFileExtension = true]) {
   }
 }
 
+// Get list of available storage directories
 Future<List<Directory>?> getStorageList() async {
-  List<Directory>? storages = await getExternalStorageDirectories();
   if (Platform.isAndroid) {
-    storages = storages!.map((Directory e) {
+    List<Directory> storages = (await getExternalStorageDirectories())!;
+    storages = storages.map((Directory e) {
       final List<String> splitedPath = e.path.split("/");
       return Directory(splitedPath
           .sublist(0, splitedPath.indexWhere((element) => element == "Android"))
           .join("/"));
     }).toList();
     return storages;
-  } else
-    return [];
+  } else if (Platform.isLinux) {
+    print("HEre");
+    Directory dir = await getApplicationDocumentsDirectory();
+    return [dir.parent];
+  }
+  return [];
 }
 
 class FileManager extends StatefulWidget {
@@ -135,7 +162,8 @@ class _FileManagerState extends State<FileManager> {
           widget.controller.setCurrentPath = snapshot.data![0].path;
           return body(context);
         } else if (snapshot.hasError) {
-          throw Exception(snapshot.error.toString());
+          print(snapshot.error);
+          return errorPage(snapshot.error.toString());
         } else {
           return loadingScreenWidget();
         }
