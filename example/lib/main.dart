@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:file_manager/file_manager.dart';
 import 'package:flutter/material.dart';
 
@@ -34,7 +32,7 @@ class HomePage extends StatelessWidget {
           appBar: AppBar(
             actions: [
               IconButton(
-                onPressed: () => controller.setCurrentStorage(strageIndex: 1),
+                onPressed: () => controller.setCurrentStorage(storageIndex: 1),
                 icon: Icon(Icons.sd_storage_rounded),
               )
             ],
