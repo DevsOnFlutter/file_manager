@@ -67,6 +67,31 @@ Future<List<FileSystemEntity>> _sortEntitysList(
         .last
         .compareTo(b.path.toLowerCase().split('.').last));
     return [...dirs, ...files];
+  } else if (sortType == SortBy.size) {
+    // create list of path and size
+    Map<String, int> _sizeMap = {};
+    for (FileSystemEntity e in list) {
+      _sizeMap[e.path] = (await e.stat()).size;
+    }
+
+    // making list of only folders.
+    final dirs = list.where((element) => element is Directory).toList();
+    // sorting folder list by name.
+    dirs.sort((a, b) => a.path.toLowerCase().compareTo(b.path.toLowerCase()));
+
+    // making list of only flies.
+    final files = list.where((element) => element is File).toList();
+
+    // creating sorted list of [_sizeMapList] by size.
+    final List<MapEntry<String, int>> _sizeMapList = _sizeMap.entries.toList();
+    _sizeMapList.sort((b, a) => a.value.compareTo(b.value));
+
+    // sort [list] according to [_sizeMapList]
+    files.sort((a, b) => _sizeMapList
+        .indexWhere((element) => element.key == a.path)
+        .compareTo(
+            _sizeMapList.indexWhere((element) => element.key == b.path)));
+    return [...dirs, ...files];
   }
   return [];
 }
@@ -109,9 +134,14 @@ Future<List<Directory>?> getStorageList() async {
     }).toList();
     return storages;
   } else if (Platform.isLinux) {
-    print("HEre");
-    Directory dir = await getApplicationDocumentsDirectory();
-    return [dir.parent];
+    final Directory dir = await getApplicationDocumentsDirectory();
+
+    // Gives the home directory.
+    final Directory home = dir.parent;
+
+    // you may provide root directory.
+    // final Directory root = dir.parent.parent.parent;
+    return [home];
   }
   return [];
 }

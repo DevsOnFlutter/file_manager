@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 class FileManagerController extends ChangeNotifier {
   String _path = "";
   int _currentStorage = 0;
-  SortBy _short = SortBy.date;
+  SortBy _short = SortBy.size;
 
   // TODO: [Documentation]
   SortBy get getSortedBy => _short;
