@@ -19,6 +19,8 @@ class _PathStat {
   _PathStat(this.path, this.dateTime);
 }
 
+///sort the files and folders according to the SortBy type
+///It will return a list of fileSystemEntity after sorting
 Future<List<FileSystemEntity>> _sortEntitysList(
     String path, SortBy sortType) async {
   final List<FileSystemEntity> list = await Directory(path).list().toList();
@@ -96,18 +98,22 @@ Future<List<FileSystemEntity>> _sortEntitysList(
   return [];
 }
 
-// check weather FileSystemEntity is Fille
+/// check weather FileSystemEntity is File
+/// return true if FileSystemEntity is a File else returns false
 bool isFile(FileSystemEntity entity) {
   return (entity is File);
 }
 
 // check weather FileSystemEntity is Directory
+/// return true if FileSystemEntity is a Directory else returns Directory
 bool isDirectory(FileSystemEntity entity) {
   return (entity is Directory);
 }
 
 /// Get the basename of Directory or File.
+/// takes the directory and returns the name of file or folder
 /// ie: controller.dirName(dir);
+/// to hide the extension of file, showFileExtension = flase
 String basename(dynamic entity, [bool showFileExtension = true]) {
   if (entity is Directory) {
     return entity.path.split('/').last;
@@ -122,7 +128,8 @@ String basename(dynamic entity, [bool showFileExtension = true]) {
   }
 }
 
-// Get list of available storage directories
+/// Get list of available storage in the device
+/// returns an empty list if there is no storage
 Future<List<Directory>?> getStorageList() async {
   if (Platform.isAndroid) {
     List<Directory> storages = (await getExternalStorageDirectories())!;
@@ -148,10 +155,41 @@ Future<List<Directory>?> getStorageList() async {
 
 class FileManager extends StatefulWidget {
   /// Provide a custom widget for loading screen.
+  /// as default CircularProgressIndicator is provided.
   final Widget? loadingScreen;
+
+  /// Provide a scroll Physics for scrolling behaviour.
   final ScrollPhysics? physics;
+
+  ///shrinkwrap will only occupy the space it need
   final bool shrinkWrap;
+
   final FileManagerController controller;
+
+  ///Builder is a custom builder which takes an entity and bulds a widget around it
+  ///
+  ///
+  ///```
+  /// builder: (context, snapshot) {
+  ///               return ListView.builder(
+  ///                 itemCount: snapshot.length,
+  ///                 itemBuilder: (context, index) {
+  ///                   return Card(
+  ///                     child: ListTile(
+  ///                       leading: isFile(snapshot[index])
+  ///                           ? Icon(Icons.feed_outlined)
+  ///                           : Icon(Icons.folder),
+  ///                       title: Text(basename(snapshot[index])),
+  ///                       onTap: () {
+  ///                         if (isDirectory(snapshot[index]))
+  ///                           controller.openDirectory(snapshot[index]);
+  ///                       },
+  ///                     ),
+  ///                   );
+  ///                 },
+  ///               );
+  ///             },
+  /// ```
   final _Builder builder;
 
   /// Hide the hidden file and folder.
@@ -177,10 +215,19 @@ class _FileManagerState extends State<FileManager> {
   @override
   void initState() {
     super.initState();
+       /// add the listner to the contoller
     widget.controller.addListener(() {
       path.value = widget.controller.getCurrentPath;
       sort.value = widget.controller.getSortedBy;
     });
+  }
+
+  /// dispose all the value notifiers
+  @override
+  void dispose() {
+    path.dispose();
+    sort.dispose();
+    super.dispose();
   }
 
   @override
@@ -201,6 +248,7 @@ class _FileManagerState extends State<FileManager> {
     );
   }
 
+  /// main body of File Manager can fetch data from the device
   Widget body(BuildContext context) {
     return ValueListenableBuilder<String>(
       valueListenable: path,
@@ -236,6 +284,7 @@ class _FileManagerState extends State<FileManager> {
     );
   }
 
+  /// error page that displays the error in the screen
   Container errorPage(String error) {
     return Container(
       color: Colors.red,
@@ -245,6 +294,8 @@ class _FileManagerState extends State<FileManager> {
     );
   }
 
+  /// loading screen if the backend is currently fecthing data from the device.
+  /// It will display simple Circular Progress Indicator if no custom widget is passed.
   Widget loadingScreenWidget() {
     if ((widget.loadingScreen == null)) {
       return Container(

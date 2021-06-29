@@ -8,8 +8,11 @@ class FileManagerController extends ChangeNotifier {
   SortBy _short = SortBy.size;
 
   // TODO: [Documentation]
+
+  /// getSorted by returns the current sorting type of the FileManager
   SortBy get getSortedBy => _short;
   // TODO: [Documentation]
+  /// setSortedBy is used to set the sorting type. 
   set setSortedBy(SortBy sortType) {
     _short = sortType;
     notifyListeners();
@@ -28,6 +31,8 @@ class FileManagerController extends ChangeNotifier {
   }
 
   // TODO: [Documentation]
+  /// goToParentDirectory returns false and goes to the parent directory of currently opened directory if the parent is accessible,
+  /// it will return true and pops the screen if the parent of currently opened directory is not accessible.
   Future<bool> goToParentDirectory() async {
     List<Directory> storageList = (await getStorageList())!;
     final bool willNotGoToParent = (storageList
@@ -52,9 +57,9 @@ class FileManagerController extends ChangeNotifier {
   int get getCurrentStorage => _currentStorage;
 
   /// Set current storege. ie: 0 is for internal storage. 1, 2 and so on, if any external storage is available.
-  Future<void> setCurrentStorage({required int strageIndex}) async {
-    _currentStorage = strageIndex;
-    _path = (await getStorageList())![strageIndex].path;
+  Future<void> setCurrentStorage({required int storageIndex}) async {
+    _currentStorage = storageIndex;
+    _path = (await getStorageList())![storageIndex].path;
     notifyListeners();
   }
 }
