@@ -46,8 +46,7 @@ class FileManagerController extends ChangeNotifier {
       _path = entity.path;
       notifyListeners();
     } else {
-      throw(
-          "FileSystemEntity entity is File. Please provide a Directory(folder) to be opened not File");
+      throw ("FileSystemEntity entity is File. Please provide a Directory(folder) to be opened not File");
     }
   }
 }
