@@ -215,7 +215,8 @@ class _FileManagerState extends State<FileManager> {
   @override
   void initState() {
     super.initState();
-       /// add the listner to the contoller
+
+    /// add the listner to the contoller
     widget.controller.addListener(() {
       path.value = widget.controller.getCurrentPath;
       sort.value = widget.controller.getSortedBy;
