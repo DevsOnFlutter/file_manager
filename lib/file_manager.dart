@@ -4,7 +4,6 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
 
-// Library Imports
 import 'package:file_manager/helper/helper.dart';
 export 'package:file_manager/helper/helper.dart';
 
@@ -19,8 +18,6 @@ class _PathStat {
   _PathStat(this.path, this.dateTime);
 }
 
-///sort the files and folders according to the SortBy type
-///It will return a list of fileSystemEntity after sorting
 Future<List<FileSystemEntity>> _sortEntitysList(
     String path, SortBy sortType) async {
   final List<FileSystemEntity> list = await Directory(path).list().toList();
@@ -99,7 +96,7 @@ Future<List<FileSystemEntity>> _sortEntitysList(
 }
 
 /// check weather FileSystemEntity is File
-/// return true if FileSystemEntity is a File else returns false
+/// return true if FileSystemEntity is File else returns false
 bool isFile(FileSystemEntity entity) {
   return (entity is File);
 }
@@ -111,8 +108,13 @@ bool isDirectory(FileSystemEntity entity) {
 }
 
 /// Get the basename of Directory or File.
-/// takes the directory and returns the name of file or folder
-/// ie: controller.dirName(dir);
+///
+/// Provide [File], [Directory] or [FileSystemEntity] and returns the name as a [String].
+///
+/// ie:
+/// ```dart
+/// controller.dirName(dir);
+/// ```
 /// to hide the extension of file, showFileExtension = flase
 String basename(dynamic entity, [bool showFileExtension = true]) {
   if (entity is Directory) {
@@ -216,14 +218,12 @@ class _FileManagerState extends State<FileManager> {
   void initState() {
     super.initState();
 
-    /// add the listner to the contoller
     widget.controller.addListener(() {
       path.value = widget.controller.getCurrentPath;
       sort.value = widget.controller.getSortedBy;
     });
   }
 
-  /// dispose all the value notifiers
   @override
   void dispose() {
     path.dispose();
@@ -237,20 +237,19 @@ class _FileManagerState extends State<FileManager> {
       future: getStorageList(),
       builder: (context, snapshot) {
         if (snapshot.hasData) {
-          widget.controller.setCurrentPath = snapshot.data![0].path;
-          return body(context);
+          widget.controller.setCurrentPath = snapshot.data!.first.path;
+          return _body(context);
         } else if (snapshot.hasError) {
           print(snapshot.error);
-          return errorPage(snapshot.error.toString());
+          return _errorPage(snapshot.error.toString());
         } else {
-          return loadingScreenWidget();
+          return _loadingScreenWidget();
         }
       },
     );
   }
 
-  /// main body of File Manager can fetch data from the device
-  Widget body(BuildContext context) {
+  Widget _body(BuildContext context) {
     return ValueListenableBuilder<String>(
       valueListenable: path,
       builder: (context, pathSnapshot, _) {
@@ -275,9 +274,9 @@ class _FileManagerState extends State<FileManager> {
                       return widget.builder(context, entitys);
                     } else if (snapshot.hasError) {
                       print(snapshot.error);
-                      return errorPage(snapshot.error.toString());
+                      return _errorPage(snapshot.error.toString());
                     } else {
-                      return loadingScreenWidget();
+                      return _loadingScreenWidget();
                     }
                   });
             });
@@ -285,8 +284,7 @@ class _FileManagerState extends State<FileManager> {
     );
   }
 
-  /// error page that displays the error in the screen
-  Container errorPage(String error) {
+  Container _errorPage(String error) {
     return Container(
       color: Colors.red,
       child: Center(
@@ -295,9 +293,7 @@ class _FileManagerState extends State<FileManager> {
     );
   }
 
-  /// loading screen if the backend is currently fecthing data from the device.
-  /// It will display simple Circular Progress Indicator if no custom widget is passed.
-  Widget loadingScreenWidget() {
+  Widget _loadingScreenWidget() {
     if ((widget.loadingScreen == null)) {
       return Container(
         child: Center(

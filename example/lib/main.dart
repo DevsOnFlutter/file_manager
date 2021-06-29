@@ -32,7 +32,8 @@ class HomePage extends StatelessWidget {
           appBar: AppBar(
             actions: [
               IconButton(
-                onPressed: () => controller.setCurrentStorage(storageIndex: 1),
+                onPressed: () async =>
+                    controller.openDirectory((await getStorageList())!.first),
                 icon: Icon(Icons.sd_storage_rounded),
               )
             ],
