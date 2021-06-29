@@ -160,6 +160,9 @@ class FileManager extends StatefulWidget {
   /// as default CircularProgressIndicator is provided.
   final Widget? loadingScreen;
 
+  /// Provide a custom widget for empty screen.
+  final Widget? emptyFolder;
+
   /// Provide a scroll Physics for scrolling behaviour.
   final ScrollPhysics? physics;
 
@@ -198,6 +201,7 @@ class FileManager extends StatefulWidget {
   final bool hideHiddenEntity;
 
   FileManager({
+    this.emptyFolder,
     this.loadingScreen,
     this.physics,
     this.shrinkWrap = false,
@@ -261,6 +265,9 @@ class _FileManagerState extends State<FileManager> {
                   builder: (context, snapshot) {
                     if (snapshot.hasData) {
                       List<FileSystemEntity> entitys = snapshot.data!;
+                      if (entitys.length == 0) {
+                        return _emptyFolderWidger();
+                      }
                       if (widget.hideHiddenEntity) {
                         entitys = entitys.where((element) {
                           if (basename(element) == "" ||
@@ -282,6 +289,15 @@ class _FileManagerState extends State<FileManager> {
             });
       },
     );
+  }
+
+  Widget _emptyFolderWidger() {
+    if (widget.emptyFolder == null) {
+      return Container(
+        child: Center(child: Text("Empty Directory")),
+      );
+    } else
+      return widget.emptyFolder!;
   }
 
   Container _errorPage(String error) {
