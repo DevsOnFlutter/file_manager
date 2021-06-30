@@ -1,6 +1,7 @@
 library file_manager;
 
 import 'dart:io';
+import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
 
@@ -132,7 +133,7 @@ String basename(dynamic entity, [bool showFileExtension = true]) {
 
 /// Get list of available storage in the device
 /// returns an empty list if there is no storage
-Future<List<Directory>?> getStorageList() async {
+Future<List<Directory>> getStorageList() async {
   if (Platform.isAndroid) {
     List<Directory> storages = (await getExternalStorageDirectories())!;
     storages = storages.map((Directory e) {

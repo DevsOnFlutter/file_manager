@@ -12,7 +12,7 @@ class FileManagerController extends ChangeNotifier {
   /// [setSortedBy] is used to set the sorting type.
   ///
   /// `SortBy{ name, type, date, size }`
-  set setSortedBy(SortBy sortType) {
+  set sortedBy(SortBy sortType) {
     _short = sortType;
     notifyListeners();
   }
