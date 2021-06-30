@@ -10,6 +10,32 @@ Make sure to check out [examples](https://github.com/DevsOnFlutter/file_manager/
 
 ### Installation
 
+Give storage permission to application
+
+Beside needing to add WRITE_EXTERNAL_STORAGE and READ_EXTERNAL_STORAGE to your android/app/src/main/AndroidManifest.xml
+
+```xml
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.xxx.yyy">
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
+
+    <application
+      android:requestLegacyExternalStorage="true"   
+      ...
+...
+</manifest>
+```
+also add f0r Android 10
+```
+    <application
+      android:requestLegacyExternalStorage="true"   
+      ...
+```
+
+**You also need Runtime Request Permission**
+allow storage permission from app setting manually or you may use any package such as [`permission_handler`](https://pub.dev/packages/permission_handler).
+
 Add the following line to `pubspec.yaml`:
 
 ```yaml
@@ -85,10 +111,7 @@ FileManager(
 |--------------|-----------------|
 | `isFile` | check weather FileSystemEntity is File. |
 | `isDirectory` | check weather FileSystemEntity is Directory. |
-| `basename` | Get the basename of Directory or File. Provide `File`, `Directory` or `FileSystemEntity` and returns the name as a `String`. ie
-```dart
- controller.dirName(dir);
-```
+| `basename` | Get the basename of Directory or File. Provide `File`, `Directory` or `FileSystemEntity` and returns the name as a `String`. If you want to hide the extension of a file, you may use optional parameter `showFileExtension`. ie ```controller.dirName(dir, true)```
 |
 | `formatBytes` | Convert bytes to human readable size.[getCurrentDirectory]. |
 | `setCurrentPath` | Set current directory path by providing `String` of path, similar to [openDirectory]. `List<FileSystemEntity>.` |
