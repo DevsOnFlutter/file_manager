@@ -156,22 +156,17 @@ Future<List<Directory>?> getStorageList() async {
 }
 
 class FileManager extends StatefulWidget {
-  /// Provide a custom widget for loading screen.
-  /// as default CircularProgressIndicator is provided.
+  /// For the loading screen, create a custom widget.
+  /// Simple Centered CircularProgressIndicator is provided by default.
   final Widget? loadingScreen;
 
-  /// Provide a custom widget for empty screen.
+  /// For an empty screen, create a custom widget.
   final Widget? emptyFolder;
 
-  /// Provide a scroll Physics for scrolling behaviour.
-  final ScrollPhysics? physics;
-
-  ///shrinkwrap will only occupy the space it need
-  final bool shrinkWrap;
-
+  ///Controls the state of the FileManager.
   final FileManagerController controller;
 
-  ///Builder is a custom builder which takes an entity and bulds a widget around it
+  ///This function allows you to create custom widgets and retrieve a list of entities `List<FileSystemEntity>.`
   ///
   ///
   ///```
@@ -197,14 +192,12 @@ class FileManager extends StatefulWidget {
   /// ```
   final _Builder builder;
 
-  /// Hide the hidden file and folder.
+  /// Hide the files and folders that are hidden.
   final bool hideHiddenEntity;
 
   FileManager({
     this.emptyFolder,
     this.loadingScreen,
-    this.physics,
-    this.shrinkWrap = false,
     required this.controller,
     required this.builder,
     this.hideHiddenEntity = true,

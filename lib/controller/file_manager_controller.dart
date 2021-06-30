@@ -6,7 +6,7 @@ class FileManagerController extends ChangeNotifier {
   String _path = "";
   SortBy _short = SortBy.size;
 
-  /// [getSortedBy] returns the current sorting type of the List<FileSystemEntity>
+  /// The sorting type that is currently in use is returned.
   SortBy get getSortedBy => _short;
 
   /// [setSortedBy] is used to set the sorting type.
@@ -17,7 +17,7 @@ class FileManagerController extends ChangeNotifier {
     notifyListeners();
   }
 
-  /// Get current [Directory].
+  /// Get current Directory.
   Directory get getCurrentDirectory => Directory(_path);
 
   /// Get current path, similar to [getCurrentDirectory].
