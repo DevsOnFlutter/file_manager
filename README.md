@@ -1,6 +1,6 @@
 # File Manager
 
-File manager is a wonderful widget that allows you to manage files and folders, pick files and folders, and do a lot more.
+FileManager is a wonderful widget that allows you to manage files and folders, pick files and folders, and do a lot more.
 Designed to feel like part of the Flutter framework.
 
 
@@ -79,6 +79,20 @@ FileManager(
 | `setCurrentPath` | Set current directory path by providing `String` of path, similar to [openDirectory]. `List<FileSystemEntity>.` |
 | `goToParentDirectory` | `goToParentDirectory` returns `bool`, goes to the parent directory of currently opened directory if the parent is accessible,  return true if current directory is the root. false, if the current directory not on root of the stogare.. |
 | `openDirectory` | Open directory by providing `Directory`. |
+
+## Otheres
+|  Properties  |   Description   |
+|--------------|-----------------|
+| `isFile` | check weather FileSystemEntity is File. |
+| `isDirectory` | check weather FileSystemEntity is Directory. |
+| `basename` | Get the basename of Directory or File. Provide `File`, `Directory` or `FileSystemEntity` and returns the name as a `String`. ie
+```dart
+ controller.dirName(dir);
+```
+|
+| `formatBytes` | Convert bytes to human readable size.[getCurrentDirectory]. |
+| `setCurrentPath` | Set current directory path by providing `String` of path, similar to [openDirectory]. `List<FileSystemEntity>.` |
+| `getStorageList` | Get list of available storage in the device, returns an empty list if there is no storage `List<Directory>`|
 
 ## Show some :heart: and :star: the repo
 

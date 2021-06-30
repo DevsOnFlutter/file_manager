@@ -131,6 +131,18 @@ String basename(dynamic entity, [bool showFileExtension = true]) {
   }
 }
 
+/// Convert bytes to human readable size
+String formatBytes(int bytes, [precision = 2]) {
+  if (bytes != 0) {
+    final double base = math.log(bytes) / math.log(1024);
+    final suffix = const ['B', 'KB', 'MB', 'GB', 'TB'][base.floor()];
+    final size = math.pow(1024, base - base.floor());
+    return '${size.toStringAsFixed(2)} $suffix';
+  } else {
+    return "0B";
+  }
+}
+
 /// Get list of available storage in the device
 /// returns an empty list if there is no storage
 Future<List<Directory>> getStorageList() async {
@@ -156,6 +168,39 @@ Future<List<Directory>> getStorageList() async {
   return [];
 }
 
+/// FileManager is a wonderful widget that allows you to manage files and folders, pick files and folders, and do a lot more.
+/// Designed to feel like part of the Flutter framework.
+///
+/// Sample code
+///```dart
+///FileManager(
+///    controller: controller,
+///    builder: (context, snapshot) {
+///    final List<FileSystemEntity> entitis = snapshot;
+///      return ListView.builder(
+///        itemCount: entitis.length,
+///        itemBuilder: (context, index) {
+///          return Card(
+///            child: ListTile(
+///              leading: isFile(entitis[index])
+///                  ? Icon(Icons.feed_outlined)
+///                  : Icon(Icons.folder),
+///              title: Text(basename(entitis[index])),
+///              onTap: () {
+///                if (isDirectory(entitis[index])) {
+///                    controller
+///                     .openDirectory(entitis[index]);
+///                  } else {
+///                      // Perform file-related tasks.
+///                  }
+///              },
+///            ),
+///          );
+///        },
+///      );
+///  },
+///),
+///```
 class FileManager extends StatefulWidget {
   /// For the loading screen, create a custom widget.
   /// Simple Centered CircularProgressIndicator is provided by default.

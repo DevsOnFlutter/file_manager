@@ -118,8 +118,9 @@ class HomePage extends StatelessWidget {
         if (snapshot.hasData) {
           if (entity is File) {
             int size = snapshot.data!.size;
+
             return Text(
-              "$size",
+              "${formatBytes(size)}",
             );
           }
           return Text(

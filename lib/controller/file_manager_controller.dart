@@ -32,7 +32,7 @@ class FileManagerController extends ChangeNotifier {
   /// [goToParentDirectory] returns [bool], goes to the parent directory of currently opened directory if the parent is accessible,
   /// return true if current directory is the root. false, if the current directory not on root of the stogare.
   Future<bool> goToParentDirectory() async {
-    List<Directory> storageList = (await getStorageList())!;
+    List<Directory> storageList = (await getStorageList());
     final bool willNotGoToParent = (storageList
         .where((element) => element.path == Directory(_path).path)
         .isNotEmpty);
