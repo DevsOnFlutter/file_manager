@@ -1,10 +1,10 @@
 library file_manager;
 
 import 'dart:io';
+import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
 
-// Library Imports
 import 'package:file_manager/helper/helper.dart';
 export 'package:file_manager/helper/helper.dart';
 
@@ -19,8 +19,6 @@ class _PathStat {
   _PathStat(this.path, this.dateTime);
 }
 
-///sort the files and folders according to the SortBy type
-///It will return a list of fileSystemEntity after sorting
 Future<List<FileSystemEntity>> _sortEntitysList(
     String path, SortBy sortType) async {
   final List<FileSystemEntity> list = await Directory(path).list().toList();
@@ -99,7 +97,7 @@ Future<List<FileSystemEntity>> _sortEntitysList(
 }
 
 /// check weather FileSystemEntity is File
-/// return true if FileSystemEntity is a File else returns false
+/// return true if FileSystemEntity is File else returns false
 bool isFile(FileSystemEntity entity) {
   return (entity is File);
 }
@@ -111,8 +109,13 @@ bool isDirectory(FileSystemEntity entity) {
 }
 
 /// Get the basename of Directory or File.
-/// takes the directory and returns the name of file or folder
-/// ie: controller.dirName(dir);
+///
+/// Provide [File], [Directory] or [FileSystemEntity] and returns the name as a [String].
+///
+/// ie:
+/// ```dart
+/// controller.dirName(dir);
+/// ```
 /// to hide the extension of file, showFileExtension = flase
 String basename(dynamic entity, [bool showFileExtension = true]) {
   if (entity is Directory) {
@@ -128,9 +131,21 @@ String basename(dynamic entity, [bool showFileExtension = true]) {
   }
 }
 
+/// Convert bytes to human readable size
+String formatBytes(int bytes, [precision = 2]) {
+  if (bytes != 0) {
+    final double base = math.log(bytes) / math.log(1024);
+    final suffix = const ['B', 'KB', 'MB', 'GB', 'TB'][base.floor()];
+    final size = math.pow(1024, base - base.floor());
+    return '${size.toStringAsFixed(2)} $suffix';
+  } else {
+    return "0B";
+  }
+}
+
 /// Get list of available storage in the device
 /// returns an empty list if there is no storage
-Future<List<Directory>?> getStorageList() async {
+Future<List<Directory>> getStorageList() async {
   if (Platform.isAndroid) {
     List<Directory> storages = (await getExternalStorageDirectories())!;
     storages = storages.map((Directory e) {
@@ -153,20 +168,51 @@ Future<List<Directory>?> getStorageList() async {
   return [];
 }
 
+/// FileManager is a wonderful widget that allows you to manage files and folders, pick files and folders, and do a lot more.
+/// Designed to feel like part of the Flutter framework.
+///
+/// Sample code
+///```dart
+///FileManager(
+///    controller: controller,
+///    builder: (context, snapshot) {
+///    final List<FileSystemEntity> entitis = snapshot;
+///      return ListView.builder(
+///        itemCount: entitis.length,
+///        itemBuilder: (context, index) {
+///          return Card(
+///            child: ListTile(
+///              leading: isFile(entitis[index])
+///                  ? Icon(Icons.feed_outlined)
+///                  : Icon(Icons.folder),
+///              title: Text(basename(entitis[index])),
+///              onTap: () {
+///                if (isDirectory(entitis[index])) {
+///                    controller
+///                     .openDirectory(entitis[index]);
+///                  } else {
+///                      // Perform file-related tasks.
+///                  }
+///              },
+///            ),
+///          );
+///        },
+///      );
+///  },
+///),
+///```
 class FileManager extends StatefulWidget {
-  /// Provide a custom widget for loading screen.
-  /// as default CircularProgressIndicator is provided.
+  /// For the loading screen, create a custom widget.
+  /// Simple Centered CircularProgressIndicator is provided by default.
   final Widget? loadingScreen;
 
-  /// Provide a scroll Physics for scrolling behaviour.
-  final ScrollPhysics? physics;
+  /// For an empty screen, create a custom widget.
+  final Widget? emptyFolder;
 
-  ///shrinkwrap will only occupy the space it need
-  final bool shrinkWrap;
-
+  ///Controls the state of the FileManager.
   final FileManagerController controller;
 
-  ///Builder is a custom builder which takes an entity and bulds a widget around it
+  ///This function allows you to create custom widgets and retrieve a list of entities `List<FileSystemEntity>.`
   ///
   ///
   ///```
@@ -192,13 +238,12 @@ class FileManager extends StatefulWidget {
   /// ```
   final _Builder builder;
 
-  /// Hide the hidden file and folder.
+  /// Hide the files and folders that are hidden.
   final bool hideHiddenEntity;
 
   FileManager({
+    this.emptyFolder,
     this.loadingScreen,
-    this.physics,
-    this.shrinkWrap = false,
     required this.controller,
     required this.builder,
     this.hideHiddenEntity = true,
@@ -216,14 +261,12 @@ class _FileManagerState extends State<FileManager> {
   void initState() {
     super.initState();
 
-    /// add the listner to the contoller
     widget.controller.addListener(() {
       path.value = widget.controller.getCurrentPath;
       sort.value = widget.controller.getSortedBy;
     });
   }
 
-  /// dispose all the value notifiers
   @override
   void dispose() {
     path.dispose();
@@ -237,20 +280,19 @@ class _FileManagerState extends State<FileManager> {
       future: getStorageList(),
       builder: (context, snapshot) {
         if (snapshot.hasData) {
-          widget.controller.setCurrentPath = snapshot.data![0].path;
-          return body(context);
+          widget.controller.setCurrentPath = snapshot.data!.first.path;
+          return _body(context);
         } else if (snapshot.hasError) {
           print(snapshot.error);
-          return errorPage(snapshot.error.toString());
+          return _errorPage(snapshot.error.toString());
         } else {
-          return loadingScreenWidget();
+          return _loadingScreenWidget();
         }
       },
     );
   }
 
-  /// main body of File Manager can fetch data from the device
-  Widget body(BuildContext context) {
+  Widget _body(BuildContext context) {
     return ValueListenableBuilder<String>(
       valueListenable: path,
       builder: (context, pathSnapshot, _) {
@@ -262,6 +304,9 @@ class _FileManagerState extends State<FileManager> {
                   builder: (context, snapshot) {
                     if (snapshot.hasData) {
                       List<FileSystemEntity> entitys = snapshot.data!;
+                      if (entitys.length == 0) {
+                        return _emptyFolderWidger();
+                      }
                       if (widget.hideHiddenEntity) {
                         entitys = entitys.where((element) {
                           if (basename(element) == "" ||
@@ -275,9 +320,9 @@ class _FileManagerState extends State<FileManager> {
                       return widget.builder(context, entitys);
                     } else if (snapshot.hasError) {
                       print(snapshot.error);
-                      return errorPage(snapshot.error.toString());
+                      return _errorPage(snapshot.error.toString());
                     } else {
-                      return loadingScreenWidget();
+                      return _loadingScreenWidget();
                     }
                   });
             });
@@ -285,8 +330,16 @@ class _FileManagerState extends State<FileManager> {
     );
   }
 
-  /// error page that displays the error in the screen
-  Container errorPage(String error) {
+  Widget _emptyFolderWidger() {
+    if (widget.emptyFolder == null) {
+      return Container(
+        child: Center(child: Text("Empty Directory")),
+      );
+    } else
+      return widget.emptyFolder!;
+  }
+
+  Container _errorPage(String error) {
     return Container(
       color: Colors.red,
       child: Center(
@@ -295,9 +348,7 @@ class _FileManagerState extends State<FileManager> {
     );
   }
 
-  /// loading screen if the backend is currently fecthing data from the device.
-  /// It will display simple Circular Progress Indicator if no custom widget is passed.
-  Widget loadingScreenWidget() {
+  Widget _loadingScreenWidget() {
     if ((widget.loadingScreen == null)) {
       return Container(
         child: Center(
