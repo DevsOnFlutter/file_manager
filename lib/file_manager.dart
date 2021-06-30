@@ -114,7 +114,7 @@ bool isDirectory(FileSystemEntity entity) {
 ///
 /// ie:
 /// ```dart
-/// controller.dirName(dir);
+/// controller.basename(dir);
 /// ```
 /// to hide the extension of file, showFileExtension = flase
 String basename(dynamic entity, [bool showFileExtension = true]) {
