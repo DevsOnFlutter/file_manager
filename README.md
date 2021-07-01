@@ -1,5 +1,11 @@
 # File Manager
 
+<img src="https://i.imgur.com/NNaUK60.png"></img>
+
+![GitHub](https://img.shields.io/github/license/DevsOnFlutter/file_manager?style=plastic) ![GitHub code size in bytes](https://img.shields.io/github/languages/code-size/DevsOnFlutter/file_manager?style=plastic) ![GitHub top language](https://img.shields.io/github/languages/top/DevsOnFlutter/file_manager?style=plastic) ![GitHub language count](https://img.shields.io/github/languages/count/DevsOnFlutter/file_manager?style=plastic) ![GitHub tag (latest by date)](https://img.shields.io/github/v/tag/DevsOnFlutter/file_manager?style=plastic) ![GitHub issues](https://img.shields.io/github/issues/DevsOnFlutter/file_manager?style=plastic) 
+
+![GitHub Repo stars](https://img.shields.io/github/stars/DevsOnFlutter/file_manager?style=social) ![GitHub forks](https://img.shields.io/github/forks/DevsOnFlutter/file_manager?style=social)
+
 FileManager is a wonderful widget that allows you to manage files and folders, pick files and folders, and do a lot more.
 Designed to feel like part of the Flutter framework.
 
@@ -12,7 +18,7 @@ Make sure to check out [examples](https://github.com/DevsOnFlutter/file_manager/
 
 Give storage permission to application
 
-Beside needing to add WRITE_EXTERNAL_STORAGE and READ_EXTERNAL_STORAGE to your android/app/src/main/AndroidManifest.xml
+Beside needing to add **WRITE_EXTERNAL_STORAGE** and **READ_EXTERNAL_STORAGE** to your android/app/src/main/AndroidManifest.xml.
 
 ```xml
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
@@ -26,7 +32,7 @@ Beside needing to add WRITE_EXTERNAL_STORAGE and READ_EXTERNAL_STORAGE to your a
 ...
 </manifest>
 ```
-also add f0r Android 10
+also add for Android 10
 ```
     <application
       android:requestLegacyExternalStorage="true"   
@@ -45,7 +51,7 @@ dependencies:
 
 ### Basic setup
 
-*The complete example is available [here](https://github.com/4-alok/draggable_home/blob/main/example/lib/main.dart).*
+*The complete example is available [here](https://github.com/DevsOnFlutter/file_manager/blob/main/example/lib/main.dart).*
 
 Required parameter for **FileManager** are `controller` and `builder`
 * `controller` The controller updates value and notifies its listeners, and FileManager updates itself appropriately whenever the user modifies the path or changes the sort-type with an associated FileManagerController.
@@ -61,19 +67,19 @@ Sample code
 FileManager(
     controller: controller,
     builder: (context, snapshot) {
-    final List<FileSystemEntity> entitis = snapshot;
+    final List<FileSystemEntity> entities = snapshot;
       return ListView.builder(
-        itemCount: entitis.length,
+        itemCount: entities.length,
         itemBuilder: (context, index) {
           return Card(
             child: ListTile(
-              leading: isFile(entitis[index])
+              leading: isFile(entities[index])
                   ? Icon(Icons.feed_outlined)
                   : Icon(Icons.folder),
-              title: Text(basename(entitis[index])),
+              title: Text(basename(entities[index])),
               onTap: () {
-                if (isDirectory(entitis[index])) {
-                    controller.openDirectory(entitis[index]);   // open directory
+                if (isDirectory(entities[index])) {
+                    controller.openDirectory(entities[index]);   // open directory
                   } else {
                       // Perform file-related tasks.
                   }
@@ -106,7 +112,7 @@ FileManager(
 | `goToParentDirectory` | `goToParentDirectory` returns `bool`, goes to the parent directory of currently opened directory if the parent is accessible,  return true if current directory is the root. false, if the current directory not on root of the stogare.. |
 | `openDirectory` | Open directory by providing `Directory`. |
 
-## Otheres
+## Others
 |  Properties  |   Description   |
 |--------------|-----------------|
 | `isFile` | check weather FileSystemEntity is File. |
@@ -119,8 +125,15 @@ FileManager(
 
 ## Show some :heart: and :star: the repo
 
+## Project Created & Maintained By
+
+### Alok Kumar
+
 [![GitHub followers](https://img.shields.io/github/followers/4-alok?style=social)](https://github.com/4-alok/)
-[![GitHub followers](https://img.shields.io/github/stars/4-alok/draggable_home?style=social)](https://github.com/4-alok/)
+
+### Arpit Sahu
+
+[![GitHub followers](https://img.shields.io/github/followers/Arpit-Sahu?style=social)](https://github.com/Arpit-Sahu/)
 
 ## Contributions
 
