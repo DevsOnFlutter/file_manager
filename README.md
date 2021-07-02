@@ -15,7 +15,7 @@ Designed to feel like part of the Flutter framework.
 ✅ &nbsp; Windows </br>
 ✅ &nbsp; Linux </br>
 ✅ &nbsp; Web </br>
-❌ &nbsp; MacOS (active issue: [iOS support](https://github.com/DevsOnFlutter/file_manager/issues/8)) </br>
+❌ &nbsp; MacOS (active issue: [MacOS support](https://github.com/DevsOnFlutter/file_manager/issues/8)) </br>
 ❌ &nbsp; iOS (active issue: [iOS support](https://github.com/DevsOnFlutter/file_manager/issues/7)) </br>
 
 ## Usage
