@@ -9,6 +9,12 @@
 FileManager is a wonderful widget that allows you to manage files and folders, pick files and folders, and do a lot more.
 Designed to feel like part of the Flutter framework.
 
+##  Compatibility
+
+✅ &nbsp; Android </br>
+✅ &nbsp; Windows </br>
+✅ &nbsp; Linux </br>
+❌ &nbsp; iOS (active issue: [iOS support](https://github.com/DevsOnFlutter/file_manager/issues/7))
 
 ## Usage
 
