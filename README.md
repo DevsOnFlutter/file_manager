@@ -125,8 +125,7 @@ FileManager(
 |--------------|-----------------|
 | `isFile` | check weather FileSystemEntity is File. |
 | `isDirectory` | check weather FileSystemEntity is Directory. |
-| `basename` | Get the basename of Directory or File. Provide `File`, `Directory` or `FileSystemEntity` and returns the name as a `String`. If you want to hide the extension of a file, you may use optional parameter `showFileExtension`. ie ```controller.dirName(dir, true)```
-|
+| `basename` | Get the basename of Directory or File. Provide `File`, `Directory` or `FileSystemEntity` and returns the name as a `String`. If you want to hide the extension of a file, you may use optional parameter `showFileExtension`. ie ```controller.dirName(dir, true)``` |
 | `formatBytes` | Convert bytes to human readable size.[getCurrentDirectory]. |
 | `setCurrentPath` | Set current directory path by providing `String` of path, similar to [openDirectory]. `List<FileSystemEntity>.` |
 | `getStorageList` | Get list of available storage in the device, returns an empty list if there is no storage `List<Directory>`|
