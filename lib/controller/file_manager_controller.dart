@@ -1,10 +1,19 @@
+import 'dart:async';
 import 'dart:io';
 import 'package:file_manager/file_manager.dart';
 import 'package:flutter/material.dart';
 
 class FileManagerController extends ChangeNotifier {
+  StreamController<String> pathStream = StreamController<String>.broadcast();
+  StreamController<String> titleStream = StreamController<String>.broadcast();
   String _path = "";
   SortBy _short = SortBy.size;
+
+  _updatePath(String path) {
+    pathStream.add(path);
+    _path = path;
+    titleStream.add(path.split('/').last);
+  }
 
   /// The sorting type that is currently in use is returned.
   SortBy get getSortedBy => _short;
@@ -25,28 +34,37 @@ class FileManagerController extends ChangeNotifier {
 
   /// Set current directory path by providing string of path, similar to [openDirectory].
   set setCurrentPath(String path) {
-    _path = path;
+    _updatePath(path);
     notifyListeners();
   }
 
-  /// [goToParentDirectory] returns [bool], goes to the parent directory of currently opened directory if the parent is accessible,
   /// return true if current directory is the root. false, if the current directory not on root of the stogare.
-  Future<bool> goToParentDirectory() async {
-    List<Directory> storageList = (await getStorageList());
-    final bool willNotGoToParent = (storageList
+  Future<bool> isRootDirectory() async {
+    final List<Directory> storageList = (await getStorageList());
+    return (storageList
         .where((element) => element.path == Directory(_path).path)
         .isNotEmpty);
-    if (!willNotGoToParent) openDirectory(Directory(_path).parent);
-    return willNotGoToParent;
+  }
+
+  /// Jumps to the parent directory of currently opened directory if the parent is accessible.
+  Future<void> goToParentDirectory() async {
+    if (!(await isRootDirectory())) openDirectory(Directory(_path).parent);
   }
 
   /// Open directory by providing [Directory].
   void openDirectory(FileSystemEntity entity) {
     if (entity is Directory) {
-      _path = entity.path;
+      _updatePath(entity.path);
       notifyListeners();
     } else {
       throw ("FileSystemEntity entity is File. Please provide a Directory(folder) to be opened not File");
     }
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    pathStream.close();
+    titleStream.close();
   }
 }

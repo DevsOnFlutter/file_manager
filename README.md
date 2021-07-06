@@ -26,7 +26,7 @@ Make sure to check out [examples](https://github.com/DevsOnFlutter/file_manager/
 
 Give storage permission to application
 
-Beside needing to add **WRITE_EXTERNAL_STORAGE** and **READ_EXTERNAL_STORAGE** to your android/app/src/main/AndroidManifest.xml.
+**Android:** Beside needing to add **WRITE_EXTERNAL_STORAGE** and **READ_EXTERNAL_STORAGE** to your android/app/src/main/AndroidManifest.xml.
 
 ```xml
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
@@ -123,7 +123,8 @@ FileManager(
 | `getCurrentDirectory` | Get current Directory |
 | `getCurrentPath` | Get current path, similar to [getCurrentDirectory]. |
 | `setCurrentPath` | Set current directory path by providing `String` of path, similar to [openDirectory]. `List<FileSystemEntity>.` |
-| `goToParentDirectory` | `goToParentDirectory` returns `bool`, goes to the parent directory of currently opened directory if the parent is accessible,  return true if current directory is the root. false, if the current directory not on root of the stogare.. |
+| `isRootDirectory` | return true if current directory is the root. false, if the current directory not on root of the stogare. |
+| `goToParentDirectory` | Jumps to the parent directory of currently opened directory if the parent is accessible. |
 | `openDirectory` | Open directory by providing `Directory`. |
 
 ## Others

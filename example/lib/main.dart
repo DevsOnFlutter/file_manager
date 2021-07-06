@@ -31,7 +31,14 @@ class HomePage extends StatelessWidget {
     // Creates a widget that registers a callback to veto attempts by the user to dismiss the enclosing
     // or controllers the system's back button
     return WillPopScope(
-      onWillPop: () async => (await controller.goToParentDirectory()),
+      onWillPop: () async {
+        if (await controller.isRootDirectory()) {
+          return true;
+        } else {
+          controller.goToParentDirectory();
+          return false;
+        }
+      },
       child: Scaffold(
           appBar: AppBar(
             actions: [
@@ -44,6 +51,12 @@ class HomePage extends StatelessWidget {
                 icon: Icon(Icons.sd_storage_rounded),
               )
             ],
+            title: StreamBuilder<String>(
+              stream: controller.titleStream.stream,
+              builder: (context, snapshot) {
+                return Text(snapshot.data!);
+              },
+            ),
             leading: IconButton(
               icon: Icon(Icons.arrow_back),
               onPressed: () async {
