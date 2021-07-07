@@ -137,6 +137,7 @@ FileManager(
 | `formatBytes` | Convert bytes to human readable size.[getCurrentDirectory]. |
 | `setCurrentPath` | Set current directory path by providing `String` of path, similar to [openDirectory]. `List<FileSystemEntity>.` |
 | `getStorageList` | Get list of available storage in the device, returns an empty list if there is no storage `List<Directory>`|
+| `createFolder` | Creates the directory if it doesn't exist. Requires currentPath and Name of the Directory. |
 
 ## Show some :heart: and :star: the repo
 
@@ -147,7 +148,6 @@ FileManager(
 ## Project Created & Maintained By
 
 * ### [DevsOnFlutter](https://github.com/DevsOnFlutter)
-
 
 </hr>
 

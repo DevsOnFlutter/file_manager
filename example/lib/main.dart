@@ -226,22 +226,39 @@ class HomePage extends StatelessWidget {
   createFolder(BuildContext context) async {
     showDialog(
       context: context,
-      builder: (context) => Dialog(
-        child: Container(
-          padding: EdgeInsets.all(10),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              ListTile(
-                  title: Text("Name"),
-                  onTap: () {
-                    controller.sortedBy = SortBy.name;
+      builder: (context) {
+        TextEditingController folderName = TextEditingController();
+        return Dialog(
+          child: Container(
+            padding: EdgeInsets.all(10),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                ListTile(
+                  title: TextField(
+                    controller: folderName,
+                  ),
+                ),
+                ElevatedButton(
+                  onPressed: () async {
+                    try {
+                      // Create Folder
+                      await FileManager.createFolder(
+                          controller.getCurrentPath, folderName.text);
+                      // Open Created Folder
+                      controller.setCurrentPath =
+                          controller.getCurrentPath + "/" + folderName.text;
+                    } catch (e) {}
+
                     Navigator.pop(context);
-                  }),
-            ],
+                  },
+                  child: Text('Create Folder'),
+                )
+              ],
+            ),
           ),
-        ),
-      ),
+        );
+      },
     );
   }
 }

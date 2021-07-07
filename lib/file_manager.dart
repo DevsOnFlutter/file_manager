@@ -227,6 +227,11 @@ class FileManager extends StatefulWidget {
     }
   }
 
+  /// Creates the directory if it doesn't exist.
+  static Future<void> createFolder(String currentPath, String name) async {
+    await Directory(currentPath + "/" + name).create();
+  }
+
   /// Get list of available storage in the device
   /// returns an empty list if there is no storage
   static Future<List<Directory>> getStorageList() async {
