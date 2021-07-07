@@ -1,6 +1,6 @@
 # File Manager
 
-![FileManager](https://i.imgur.com/NNaUK60.png)
+![FileManager-Banner](https://i.imgur.com/NNaUK60.png)
 
 ![GitHub](https://img.shields.io/github/license/DevsOnFlutter/file_manager?style=plastic) ![GitHub code size in bytes](https://img.shields.io/github/languages/code-size/DevsOnFlutter/file_manager?style=plastic) ![GitHub top language](https://img.shields.io/github/languages/top/DevsOnFlutter/file_manager?style=plastic) ![GitHub language count](https://img.shields.io/github/languages/count/DevsOnFlutter/file_manager?style=plastic) ![GitHub tag (latest by date)](https://img.shields.io/github/v/tag/DevsOnFlutter/file_manager?style=plastic) ![GitHub issues](https://img.shields.io/github/issues/DevsOnFlutter/file_manager?style=plastic)
 
