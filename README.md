@@ -4,8 +4,6 @@
 
 ![GitHub](https://img.shields.io/github/license/DevsOnFlutter/file_manager?style=plastic) ![GitHub code size in bytes](https://img.shields.io/github/languages/code-size/DevsOnFlutter/file_manager?style=plastic) ![GitHub top language](https://img.shields.io/github/languages/top/DevsOnFlutter/file_manager?style=plastic) ![GitHub language count](https://img.shields.io/github/languages/count/DevsOnFlutter/file_manager?style=plastic) ![GitHub tag (latest by date)](https://img.shields.io/github/v/tag/DevsOnFlutter/file_manager?style=plastic) ![GitHub issues](https://img.shields.io/github/issues/DevsOnFlutter/file_manager?style=plastic)
 
-![GitHub Repo stars](https://img.shields.io/github/stars/DevsOnFlutter/file_manager?style=social) ![GitHub forks](https://img.shields.io/github/forks/DevsOnFlutter/file_manager?style=social)
-
 FileManager is a wonderful widget that allows you to manage files and folders, pick files and folders, and do a lot more.
 Designed to feel like part of the Flutter framework.
 
@@ -126,6 +124,7 @@ FileManager(
 | `isRootDirectory` | return true if current directory is the root. false, if the current directory not on root of the stogare. |
 | `goToParentDirectory` | Jumps to the parent directory of currently opened directory if the parent is accessible. |
 | `openDirectory` | Open directory by providing `Directory`. |
+| `titleNotifier` | ValueNotifier of the current directory's basename |
 
 ## Others
 
@@ -141,9 +140,14 @@ FileManager(
 
 ## Show some :heart: and :star: the repo
 
+![GitHub Repo stars](https://img.shields.io/github/stars/DevsOnFlutter/file_manager?style=social)
+![GitHub forks](https://img.shields.io/github/forks/DevsOnFlutter/file_manager?style=social)
+[![GitHub followers](https://img.shields.io/github/followers/4-alok?style=social)](https://github.com/4-alok/)
+
 ## Project Created & Maintained By
 
-### [DevsOnFlutter](https://github.com/DevsOnFlutter)
+* ### [DevsOnFlutter](https://github.com/DevsOnFlutter)
+
 
 </hr>
 

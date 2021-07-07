@@ -4,15 +4,30 @@ import 'package:flutter/widgets.dart';
 
 class FileManagerController {
   final ValueNotifier<String> _path = ValueNotifier<String>('');
-  final ValueNotifier<String> title = ValueNotifier<String>('');
   final ValueNotifier<SortBy> _short = ValueNotifier<SortBy>(SortBy.name);
 
   _updatePath(String path) {
     _path.value = path;
-    title.value = path.split('/').last;
+    titleNotifier.value = path.split('/').last;
   }
 
+  /// ValueNotifier of the current directory's basename
+  ///
+  /// ie:
+  /// ```dart
+  /// ValueListenableBuilder<String>(
+  ///    valueListenable: controller.titleNotifier,
+  ///    builder: (context, title, _) {
+  ///     return Text(title);
+  ///   },
+  /// ),
+  /// ```
+  final ValueNotifier<String> titleNotifier = ValueNotifier<String>('');
+
+  /// Get ValueNotifier of path
   ValueNotifier<String> get getPathNotifier => _path;
+
+  /// Get ValueNotifier of SortedBy
   ValueNotifier<SortBy> get getSortedByNotifier => _short;
 
   /// The sorting type that is currently in use is returned.
@@ -57,9 +72,10 @@ class FileManagerController {
     }
   }
 
+  /// Dispose FileManagerController
   void dispose() {
     _path.dispose();
-    title.dispose();
+    titleNotifier.dispose();
     _short.dispose();
   }
 }

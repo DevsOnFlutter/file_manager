@@ -43,6 +43,10 @@ class HomePage extends StatelessWidget {
           appBar: AppBar(
             actions: [
               IconButton(
+                onPressed: () => createFolder(context),
+                icon: Icon(Icons.create_new_folder_outlined),
+              ),
+              IconButton(
                 onPressed: () => sort(context),
                 icon: Icon(Icons.sort_rounded),
               ),
@@ -52,7 +56,7 @@ class HomePage extends StatelessWidget {
               )
             ],
             title: ValueListenableBuilder<String>(
-              valueListenable: controller.title,
+              valueListenable: controller.titleNotifier,
               builder: (context, title, _) => Text(title),
             ),
             leading: IconButton(
@@ -181,40 +185,63 @@ class HomePage extends StatelessWidget {
 
   sort(BuildContext context) async {
     showDialog(
-        context: context,
-        builder: (context) => Dialog(
-              child: Container(
-                padding: EdgeInsets.all(10),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    ListTile(
-                        title: Text("Name"),
-                        onTap: () {
-                          controller.sortedBy = SortBy.name;
-                          Navigator.pop(context);
-                        }),
-                    ListTile(
-                        title: Text("Size"),
-                        onTap: () {
-                          controller.sortedBy = SortBy.size;
-                          Navigator.pop(context);
-                        }),
-                    ListTile(
-                        title: Text("Date"),
-                        onTap: () {
-                          controller.sortedBy = SortBy.date;
-                          Navigator.pop(context);
-                        }),
-                    ListTile(
-                        title: Text("type"),
-                        onTap: () {
-                          controller.sortedBy = SortBy.type;
-                          Navigator.pop(context);
-                        }),
-                  ],
-                ),
-              ),
-            ));
+      context: context,
+      builder: (context) => Dialog(
+        child: Container(
+          padding: EdgeInsets.all(10),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              ListTile(
+                  title: Text("Name"),
+                  onTap: () {
+                    controller.sortedBy = SortBy.name;
+                    Navigator.pop(context);
+                  }),
+              ListTile(
+                  title: Text("Size"),
+                  onTap: () {
+                    controller.sortedBy = SortBy.size;
+                    Navigator.pop(context);
+                  }),
+              ListTile(
+                  title: Text("Date"),
+                  onTap: () {
+                    controller.sortedBy = SortBy.date;
+                    Navigator.pop(context);
+                  }),
+              ListTile(
+                  title: Text("type"),
+                  onTap: () {
+                    controller.sortedBy = SortBy.type;
+                    Navigator.pop(context);
+                  }),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  createFolder(BuildContext context) async {
+    showDialog(
+      context: context,
+      builder: (context) => Dialog(
+        child: Container(
+          padding: EdgeInsets.all(10),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              ListTile(
+                  title: Text("Name"),
+                  onTap: () {
+                    controller.sortedBy = SortBy.name;
+                    Navigator.pop(context);
+                  }),
+            ],
+          ),
+        ),
+      ),
+    );
   }
 }
