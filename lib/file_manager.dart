@@ -110,12 +110,12 @@ Future<List<FileSystemEntity>> _sortEntitysList(
 ///        itemBuilder: (context, index) {
 ///          return Card(
 ///            child: ListTile(
-///              leading: isFile(entitis[index])
+///              leading: FileManager.isFile(entitis[index])
 ///                  ? Icon(Icons.feed_outlined)
 ///                  : Icon(Icons.folder),
-///              title: Text(basename(entitis[index])),
+///              title: Text(FileManager.basename(entitis[index])),
 ///              onTap: () {
-///                if (isDirectory(entitis[index])) {
+///                if (FileManager.isDirectory(entitis[index])) {
 ///                    controller
 ///                     .openDirectory(entitis[index]);
 ///                  } else {
@@ -150,12 +150,12 @@ class FileManager extends StatefulWidget {
   ///                 itemBuilder: (context, index) {
   ///                   return Card(
   ///                     child: ListTile(
-  ///                       leading: isFile(snapshot[index])
+  ///                       leading: FileManager.isFile(snapshot[index])
   ///                           ? Icon(Icons.feed_outlined)
   ///                           : Icon(Icons.folder),
-  ///                       title: Text(basename(snapshot[index])),
+  ///                       title: Text(FileManager.basename(snapshot[index])),
   ///                       onTap: () {
-  ///                         if (isDirectory(snapshot[index]))
+  ///                         if (FileManager.isDirectory(snapshot[index]))
   ///                           controller.openDirectory(snapshot[index]);
   ///                       },
   ///                     ),

@@ -81,12 +81,12 @@ FileManager(
         itemBuilder: (context, index) {
           return Card(
             child: ListTile(
-              leading: isFile(entities[index])
+              leading: FileManager.isFile(entities[index])
                   ? Icon(Icons.feed_outlined)
                   : Icon(Icons.folder),
-              title: Text(basename(entities[index])),
+              title: Text(FileManager.basename(entities[index])),
               onTap: () {
-                if (isDirectory(entities[index])) {
+                if (FileManager.isDirectory(entities[index])) {
                     controller.openDirectory(entities[index]);   // open directory
                   } else {
                       // Perform file-related tasks.
@@ -139,12 +139,14 @@ FileManager(
 | `createFolder` | Creates the directory if it doesn't exist. Requires currentPath and Name of the Directory. |
 
 </hr>
+<p>
 
 <img width="205px" height ="444px" alt="Example" src="https://imgur.com/RXwvwB9.gif"/>
 <img width="205px" height ="444px" alt="Example" src="https://imgur.com/a56XQv7.png"/>
 <img width="205px" height ="444px" alt="Example" src="https://imgur.com/q4Ouf3M.png"/>
 <img width="205px" height ="444px" alt="Example" src="https://imgur.com/CwB5wb0.png"/>
 
+</p>
 </hr>
 
 ## Show some :heart: and :star: the repo
