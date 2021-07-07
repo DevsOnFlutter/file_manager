@@ -24,7 +24,14 @@ Make sure to check out [examples](https://github.com/DevsOnFlutter/file_manager/
 
 ### Installation
 
-Give storage permission to application
+**Dependencies** Add the following line to `pubspec.yaml`:
+
+```yaml
+dependencies:
+  file_manager: ^1.0.0
+```
+
+### Give storage permission to application
 
 **Android:** Beside needing to add **WRITE_EXTERNAL_STORAGE** and **READ_EXTERNAL_STORAGE** to your android/app/src/main/AndroidManifest.xml.
 
@@ -47,13 +54,6 @@ also add for Android 10
 
 **You also need Runtime Request Permission**
 allow storage permission from app setting manually or you may use any package such as [`permission_handler`](https://pub.dev/packages/permission_handler).
-
-Add the following line to `pubspec.yaml`:
-
-```yaml
-dependencies:
-  file_manager: ^1.0.0
-```
 
 </hr>
 

@@ -51,11 +51,9 @@ class HomePage extends StatelessWidget {
                 icon: Icon(Icons.sd_storage_rounded),
               )
             ],
-            title: StreamBuilder<String>(
-              stream: controller.titleStream.stream,
-              builder: (context, snapshot) {
-                return Text(snapshot.data!);
-              },
+            title: ValueListenableBuilder<String>(
+              valueListenable: controller.title,
+              builder: (context, title, _) => Text(title),
             ),
             leading: IconButton(
               icon: Icon(Icons.arrow_back),
@@ -76,13 +74,13 @@ class HomePage extends StatelessWidget {
                     FileSystemEntity entity = entities[index];
                     return Card(
                       child: ListTile(
-                        leading: isFile(entity)
+                        leading: FileManager.isFile(entity)
                             ? Icon(Icons.feed_outlined)
                             : Icon(Icons.folder),
-                        title: Text(basename(entity)),
+                        title: Text(FileManager.basename(entity)),
                         subtitle: subtitle(entity),
                         onTap: () async {
-                          if (isDirectory(entity)) {
+                          if (FileManager.isDirectory(entity)) {
                             // open the folder
                             controller.openDirectory(entity);
 
@@ -133,7 +131,7 @@ class HomePage extends StatelessWidget {
             int size = snapshot.data!.size;
 
             return Text(
-              "${formatBytes(size)}",
+              "${FileManager.formatBytes(size)}",
             );
           }
           return Text(
@@ -151,7 +149,7 @@ class HomePage extends StatelessWidget {
       context: context,
       builder: (context) => Dialog(
         child: FutureBuilder<List<Directory>>(
-          future: getStorageList(),
+          future: FileManager.getStorageList(),
           builder: (context, snapshot) {
             if (snapshot.hasData) {
               final List<FileSystemEntity> storageList = snapshot.data!;
@@ -162,7 +160,7 @@ class HomePage extends StatelessWidget {
                     children: storageList
                         .map((e) => ListTile(
                               title: Text(
-                                "${basename(e)}",
+                                "${FileManager.basename(e)}",
                               ),
                               onTap: () {
                                 controller.openDirectory(e);

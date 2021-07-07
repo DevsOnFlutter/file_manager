@@ -96,78 +96,6 @@ Future<List<FileSystemEntity>> _sortEntitysList(
   return [];
 }
 
-/// check weather FileSystemEntity is File
-/// return true if FileSystemEntity is File else returns false
-bool isFile(FileSystemEntity entity) {
-  return (entity is File);
-}
-
-// check weather FileSystemEntity is Directory
-/// return true if FileSystemEntity is a Directory else returns Directory
-bool isDirectory(FileSystemEntity entity) {
-  return (entity is Directory);
-}
-
-/// Get the basename of Directory or File.
-///
-/// Provide [File], [Directory] or [FileSystemEntity] and returns the name as a [String].
-///
-/// ie:
-/// ```dart
-/// controller.basename(dir);
-/// ```
-/// to hide the extension of file, showFileExtension = flase
-String basename(dynamic entity, [bool showFileExtension = true]) {
-  if (entity is Directory) {
-    return entity.path.split('/').last;
-  } else if (entity is File) {
-    return (showFileExtension)
-        ? entity.path.split('/').last.split('.').first
-        : entity.path.split('/').last;
-  } else {
-    print(
-        "Please provide a Object of type File, Directory or FileSystemEntity");
-    return "";
-  }
-}
-
-/// Convert bytes to human readable size
-String formatBytes(int bytes, [precision = 2]) {
-  if (bytes != 0) {
-    final double base = math.log(bytes) / math.log(1024);
-    final suffix = const ['B', 'KB', 'MB', 'GB', 'TB'][base.floor()];
-    final size = math.pow(1024, base - base.floor());
-    return '${size.toStringAsFixed(2)} $suffix';
-  } else {
-    return "0B";
-  }
-}
-
-/// Get list of available storage in the device
-/// returns an empty list if there is no storage
-Future<List<Directory>> getStorageList() async {
-  if (Platform.isAndroid) {
-    List<Directory> storages = (await getExternalStorageDirectories())!;
-    storages = storages.map((Directory e) {
-      final List<String> splitedPath = e.path.split("/");
-      return Directory(splitedPath
-          .sublist(0, splitedPath.indexWhere((element) => element == "Android"))
-          .join("/"));
-    }).toList();
-    return storages;
-  } else if (Platform.isLinux) {
-    final Directory dir = await getApplicationDocumentsDirectory();
-
-    // Gives the home directory.
-    final Directory home = dir.parent;
-
-    // you may provide root directory.
-    // final Directory root = dir.parent.parent.parent;
-    return [home];
-  }
-  return [];
-}
-
 /// FileManager is a wonderful widget that allows you to manage files and folders, pick files and folders, and do a lot more.
 /// Designed to feel like part of the Flutter framework.
 ///
@@ -251,33 +179,92 @@ class FileManager extends StatefulWidget {
 
   @override
   _FileManagerState createState() => _FileManagerState();
+
+  /// check weather FileSystemEntity is File
+  /// return true if FileSystemEntity is File else returns false
+  static bool isFile(FileSystemEntity entity) {
+    return (entity is File);
+  }
+
+// check weather FileSystemEntity is Directory
+  /// return true if FileSystemEntity is a Directory else returns Directory
+  static bool isDirectory(FileSystemEntity entity) {
+    return (entity is Directory);
+  }
+
+  /// Get the basename of Directory or File.
+  ///
+  /// Provide [File], [Directory] or [FileSystemEntity] and returns the name as a [String].
+  ///
+  /// ie:
+  /// ```dart
+  /// controller.basename(dir);
+  /// ```
+  /// to hide the extension of file, showFileExtension = flase
+  static String basename(dynamic entity, [bool showFileExtension = true]) {
+    if (entity is Directory) {
+      return entity.path.split('/').last;
+    } else if (entity is File) {
+      return (showFileExtension)
+          ? entity.path.split('/').last.split('.').first
+          : entity.path.split('/').last;
+    } else {
+      print(
+          "Please provide a Object of type File, Directory or FileSystemEntity");
+      return "";
+    }
+  }
+
+  /// Convert bytes to human readable size
+  static String formatBytes(int bytes, [precision = 2]) {
+    if (bytes != 0) {
+      final double base = math.log(bytes) / math.log(1024);
+      final suffix = const ['B', 'KB', 'MB', 'GB', 'TB'][base.floor()];
+      final size = math.pow(1024, base - base.floor());
+      return '${size.toStringAsFixed(2)} $suffix';
+    } else {
+      return "0B";
+    }
+  }
+
+  /// Get list of available storage in the device
+  /// returns an empty list if there is no storage
+  static Future<List<Directory>> getStorageList() async {
+    if (Platform.isAndroid) {
+      List<Directory> storages = (await getExternalStorageDirectories())!;
+      storages = storages.map((Directory e) {
+        final List<String> splitedPath = e.path.split("/");
+        return Directory(splitedPath
+            .sublist(
+                0, splitedPath.indexWhere((element) => element == "Android"))
+            .join("/"));
+      }).toList();
+      return storages;
+    } else if (Platform.isLinux) {
+      final Directory dir = await getApplicationDocumentsDirectory();
+
+      // Gives the home directory.
+      final Directory home = dir.parent;
+
+      // you may provide root directory.
+      // final Directory root = dir.parent.parent.parent;
+      return [home];
+    }
+    return [];
+  }
 }
 
 class _FileManagerState extends State<FileManager> {
-  final ValueNotifier<String> path = ValueNotifier<String>("");
-  final ValueNotifier<SortBy> sort = ValueNotifier<SortBy>(SortBy.name);
-
-  @override
-  void initState() {
-    super.initState();
-
-    widget.controller.addListener(() {
-      path.value = widget.controller.getCurrentPath;
-      sort.value = widget.controller.getSortedBy;
-    });
-  }
-
   @override
   void dispose() {
-    path.dispose();
-    sort.dispose();
+    widget.controller.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     return FutureBuilder<List<Directory>?>(
-      future: getStorageList(),
+      future: FileManager.getStorageList(),
       builder: (context, snapshot) {
         if (snapshot.hasData) {
           widget.controller.setCurrentPath = snapshot.data!.first.path;
@@ -294,13 +281,14 @@ class _FileManagerState extends State<FileManager> {
 
   Widget _body(BuildContext context) {
     return ValueListenableBuilder<String>(
-      valueListenable: path,
+      valueListenable: widget.controller.getPathNotifier,
       builder: (context, pathSnapshot, _) {
         return ValueListenableBuilder<SortBy>(
-            valueListenable: sort,
+            valueListenable: widget.controller.getSortedByNotifier,
             builder: (context, snapshot, _) {
               return FutureBuilder<List<FileSystemEntity>>(
-                  future: _sortEntitysList(pathSnapshot, sort.value),
+                  future: _sortEntitysList(pathSnapshot,
+                      widget.controller.getSortedByNotifier.value),
                   builder: (context, snapshot) {
                     if (snapshot.hasData) {
                       List<FileSystemEntity> entitys = snapshot.data!;
@@ -309,8 +297,8 @@ class _FileManagerState extends State<FileManager> {
                       }
                       if (widget.hideHiddenEntity) {
                         entitys = entitys.where((element) {
-                          if (basename(element) == "" ||
-                              basename(element).startsWith('.')) {
+                          if (FileManager.basename(element) == "" ||
+                              FileManager.basename(element).startsWith('.')) {
                             return false;
                           } else {
                             return true;
