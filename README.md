@@ -132,8 +132,7 @@ FileManager(
 |--------------|-----------------|
 | `isFile` | check weather FileSystemEntity is File. |
 | `isDirectory` | check weather FileSystemEntity is Directory. |
-| `basename` | Get the basename of Directory or File. Provide `File`, `Directory` or `FileSystemEntity` and returns the name as a `String`. If you want to hide the extension of a file, you may use optional parameter `showFileExtension`. ie ```controller.dirName(dir, true)```
-|
+| `basename` | Get the basename of Directory or File. Provide `File`, `Directory` or `FileSystemEntity` and returns the name as a `String`. If you want to hide the extension of a file, you may use optional parameter `showFileExtension`. ie ```controller.dirName(dir, true)```|
 | `formatBytes` | Convert bytes to human readable size.[getCurrentDirectory]. |
 | `setCurrentPath` | Set current directory path by providing `String` of path, similar to [openDirectory]. `List<FileSystemEntity>.` |
 | `getStorageList` | Get list of available storage in the device, returns an empty list if there is no storage `List<Directory>`|
@@ -141,10 +140,10 @@ FileManager(
 
 </hr>
 
-![gif](https://imgur.com/RXwvwB9.gif)
-![gif](https://imgur.com/a56XQv7.png)
-![gif](https://imgur.com/q4Ouf3M.png)
-![gif](https://imgur.com/CwB5wb0.png)
+<img width="205px" height ="444px" alt="Example" src="https://imgur.com/RXwvwB9.gif"/>
+<img width="205px" height ="444px" alt="Example" src="https://imgur.com/a56XQv7.png"/>
+<img width="205px" height ="444px" alt="Example" src="https://imgur.com/q4Ouf3M.png"/>
+<img width="205px" height ="444px" alt="Example" src="https://imgur.com/CwB5wb0.png"/>
 
 </hr>
 
