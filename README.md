@@ -139,6 +139,15 @@ FileManager(
 | `getStorageList` | Get list of available storage in the device, returns an empty list if there is no storage `List<Directory>`|
 | `createFolder` | Creates the directory if it doesn't exist. Requires currentPath and Name of the Directory. |
 
+</hr>
+
+![gif](https://imgur.com/RXwvwB9.gif)
+![gif](https://imgur.com/a56XQv7.png)
+![gif](https://imgur.com/q4Ouf3M.png)
+![gif](https://imgur.com/CwB5wb0.png)
+
+</hr>
+
 ## Show some :heart: and :star: the repo
 
 ![GitHub Repo stars](https://img.shields.io/github/stars/DevsOnFlutter/file_manager?style=social)
