@@ -117,7 +117,7 @@ FileManager(
 |  Properties  |   Description   |
 |--------------|-----------------|
 | `getSortedBy` | The sorting type that is currently in use is returned. |
-| `setSortedBy` | is used to set the sorting type. `SortBy{ name, type, date, size }`. |
+| `setSortBy` | is used to set the sorting type. `SortBy{ name, type, date, size }`. ie: `controller.sortBy(SortBy.date)` |
 | `getCurrentDirectory` | Get current Directory |
 | `getCurrentPath` | Get current path, similar to [getCurrentDirectory]. |
 | `setCurrentPath` | Set current directory path by providing `String` of path, similar to [openDirectory]. `List<FileSystemEntity>.` |
@@ -125,6 +125,25 @@ FileManager(
 | `goToParentDirectory` | Jumps to the parent directory of currently opened directory if the parent is accessible. |
 | `openDirectory` | Open directory by providing `Directory`. |
 | `titleNotifier` | ValueNotifier of the current directory's basename |
+
+## ControlBackButton
+
+When the current directory is not root, this widget registers a callback to prevent the user from dismissing the window, or controllers the system's back button
+
+ie:-
+
+```dart
+  // Wrap Scaffold containing FileManage with ControlBackButton
+  ControlBackButton(
+    controller: controller
+    child: Scaffold(
+      appBar: AppBar(...)
+      body: FileManager(
+        ...
+      )
+    )
+  )
+```
 
 ## Others
 

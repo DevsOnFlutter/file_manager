@@ -357,3 +357,42 @@ class _FileManagerState extends State<FileManager> {
     }
   }
 }
+
+
+// When the current directory is not root, this widget registers a callback to prevent the user from dismissing the window
+// , or controllers the system's back button
+// 
+// Wrap Scaffold containing FileManage with ControlBackButton
+// ControlBackButton(
+//   controller: controller
+//   child: Scaffold(
+//     appBar: AppBar(...)
+//     body: FileManager(
+//       ...
+//     )
+//   )
+// )
+class ControlBackButton extends StatelessWidget {
+  const ControlBackButton({
+    required this.child,
+    required this.controller,
+    Key? key,
+  }) : super(key: key);
+
+  final Widget child;
+  final FileManagerController controller;
+  @override
+  Widget build(BuildContext context) {
+    return WillPopScope(
+      child: child,
+      onWillPop: () async {
+        if (await controller.isRootDirectory()) {
+          return true;
+        } else {
+          controller.goToParentDirectory();
+          return false;
+        }
+      },
+    );
+  }
+}

@@ -26,17 +26,8 @@ class HomePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Creates a widget that registers a callback to veto attempts by the user to dismiss the enclosing
-    // or controllers the system's back button
-    return WillPopScope(
-      onWillPop: () async {
-        if (await controller.isRootDirectory()) {
-          return true;
-        } else {
-          controller.goToParentDirectory();
-          return false;
-        }
-      },
+    return ControlBackButton(
+      controller: controller,
       child: Scaffold(
           appBar: AppBar(
             actions: [
@@ -85,31 +76,31 @@ class HomePage extends StatelessWidget {
                           if (FileManager.isDirectory(entity)) {
                             // open the folder
                             controller.openDirectory(entity);
-
+    
                             // delete a folder
                             // await entity.delete(recursive: true);
-
+    
                             // rename a folder
                             // await entity.rename("newPath");
-
+    
                             // Check weather folder exists
                             // entity.exists();
-
+    
                             // get date of file
                             // DateTime date = (await entity.stat()).modified;
                           } else {
                             // delete a file
                             // await entity.delete();
-
+    
                             // rename a file
                             // await entity.rename("newPath");
-
+    
                             // Check weather file exists
                             // entity.exists();
-
+    
                             // get date of file
                             // DateTime date = (await entity.stat()).modified;
-
+    
                             // get the size of the file
                             // int size = (await entity.stat()).size;
                           }
@@ -193,25 +184,25 @@ class HomePage extends StatelessWidget {
               ListTile(
                   title: Text("Name"),
                   onTap: () {
-                    controller.sortedBy = SortBy.name;
+                    controller.sortBy(SortBy.name);
                     Navigator.pop(context);
                   }),
               ListTile(
                   title: Text("Size"),
                   onTap: () {
-                    controller.sortedBy = SortBy.size;
+                    controller.sortBy(SortBy.size);
                     Navigator.pop(context);
                   }),
               ListTile(
                   title: Text("Date"),
                   onTap: () {
-                    controller.sortedBy = SortBy.date;
+                    controller.sortBy(SortBy.date);
                     Navigator.pop(context);
                   }),
               ListTile(
                   title: Text("type"),
                   onTap: () {
-                    controller.sortedBy = SortBy.type;
+                    controller.sortBy(SortBy.type);
                     Navigator.pop(context);
                   }),
             ],

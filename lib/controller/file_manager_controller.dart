@@ -36,7 +36,8 @@ class FileManagerController {
   /// [setSortedBy] is used to set the sorting type.
   ///
   /// `SortBy{ name, type, date, size }`
-  set sortedBy(SortBy sortType) => _short.value = sortType;
+  /// ie: `controller.sortBy(SortBy.date)`
+  void sortBy(SortBy sortType) => _short.value = sortType;
 
   /// Get current Directory.
   Directory get getCurrentDirectory => Directory(_path.value);
