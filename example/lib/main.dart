@@ -128,7 +128,7 @@ class HomePage extends StatelessWidget {
             );
           }
           return Text(
-            "${snapshot.data!.modified}",
+            "${snapshot.data!.modified}".substring(0, 10),
           );
         } else {
           return Text("");

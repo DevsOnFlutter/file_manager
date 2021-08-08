@@ -216,12 +216,12 @@ class FileManager extends StatefulWidget {
   }
 
   /// Convert bytes to human readable size
-  static String formatBytes(int bytes, [precision = 2]) {
+  static String formatBytes(int bytes, [int precision = 2]) {
     if (bytes != 0) {
       final double base = math.log(bytes) / math.log(1024);
       final suffix = const ['B', 'KB', 'MB', 'GB', 'TB'][base.floor()];
       final size = math.pow(1024, base - base.floor());
-      return '${size.toStringAsFixed(2)} $suffix';
+      return '${size.toStringAsFixed(precision)} $suffix';
     } else {
       return "0B";
     }
@@ -230,6 +230,17 @@ class FileManager extends StatefulWidget {
   /// Creates the directory if it doesn't exist.
   static Future<void> createFolder(String currentPath, String name) async {
     await Directory(currentPath + "/" + name).create();
+  }
+
+  /// Return file extension as String.
+  /// 
+  /// ie:- `File("/../image.png")` to `"png"`
+  static String getFileExtension(FileSystemEntity file) {
+    if (file is File) {
+      return file.path.split("/").last.split('.').last;
+    } else {
+      throw "FileSystemEntity is Directory, not a File";
+    }
   }
 
   /// Get list of available storage in the device
@@ -358,20 +369,21 @@ class _FileManagerState extends State<FileManager> {
   }
 }
 
-
-// When the current directory is not root, this widget registers a callback to prevent the user from dismissing the window
-// , or controllers the system's back button
-// 
-// Wrap Scaffold containing FileManage with ControlBackButton
-// ControlBackButton(
-//   controller: controller
-//   child: Scaffold(
-//     appBar: AppBar(...)
-//     body: FileManager(
-//       ...
-//     )
-//   )
-// )
+/// When the current directory is not root, this widget registers a callback to prevent the user from dismissing the window
+/// , or controllers the system's back button
+///
+/// #### Wrap Scaffold containing FileManage with `ControlBackButton`
+/// ```dart
+/// ControlBackButton(
+///   controller: controller
+///   child: Scaffold(
+///     appBar: AppBar(...)
+///     body: FileManager(
+///       ...
+///     )
+///   )
+/// )
+/// ```
 class ControlBackButton extends StatelessWidget {
   const ControlBackButton({
     required this.child,

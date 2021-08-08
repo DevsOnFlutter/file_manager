@@ -112,7 +112,7 @@ FileManager(
 | `hideHiddenEntity` | Hide the files and folders that are hidden. |
 | `builder` | This function allows you to create custom widgets and retrieve a list of entities `List<FileSystemEntity>.` |
 
-## FileManagerContoller
+## FileManagerController
 
 |  Properties  |   Description   |
 |--------------|-----------------|
@@ -121,7 +121,7 @@ FileManager(
 | `getCurrentDirectory` | Get current Directory |
 | `getCurrentPath` | Get current path, similar to [getCurrentDirectory]. |
 | `setCurrentPath` | Set current directory path by providing `String` of path, similar to [openDirectory]. `List<FileSystemEntity>.` |
-| `isRootDirectory` | return true if current directory is the root. false, if the current directory not on root of the stogare. |
+| `isRootDirectory` | return true if current directory is the root. false, if the current directory not on root of the storage. |
 | `goToParentDirectory` | Jumps to the parent directory of currently opened directory if the parent is accessible. |
 | `openDirectory` | Open directory by providing `Directory`. |
 | `titleNotifier` | ValueNotifier of the current directory's basename |
@@ -154,6 +154,7 @@ ie:-
 | `basename` | Get the basename of Directory or File. Provide `File`, `Directory` or `FileSystemEntity` and returns the name as a `String`. If you want to hide the extension of a file, you may use optional parameter `showFileExtension`. ie ```controller.dirName(dir, true)```|
 | `formatBytes` | Convert bytes to human readable size.[getCurrentDirectory]. |
 | `setCurrentPath` | Set current directory path by providing `String` of path, similar to [openDirectory]. `List<FileSystemEntity>.` |
+| `getFileExtension` | Return file extension as String. ie:- `File("/../image.png")` to `"png"`. |
 | `getStorageList` | Get list of available storage in the device, returns an empty list if there is no storage `List<Directory>`|
 | `createFolder` | Creates the directory if it doesn't exist. Requires currentPath and Name of the Directory. |
 
@@ -191,12 +192,12 @@ For a custom-hook to be merged, you will need to do the following:
 * Describe the use-case.
 
 * Open an issue explaining why we need this hook, how to use it, ...
-  This is important as a hook will not get merged if the hook doens't appeal to
+  This is important as a hook will not get merged if the hook doesn't appeal to
   a large number of people.
 
 * If your hook is rejected, don't worry! A rejection doesn't mean that it won't
   be merged later in the future if more people shows an interest in it.
   In the mean-time, feel free to publish your hook as a package on <https://pub.dev>.
 
-* A hook will not be merged unles fully tested, to avoid breaking it inadvertendly
+* A hook will not be merged unless fully tested, to avoid breaking it inadvertently
   in the future.
