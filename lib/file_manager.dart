@@ -183,6 +183,16 @@ class FileManager extends StatefulWidget {
   /// APP_EXT_STORAGE_DIR -> getExternalStorageDirectories()
   static Future<List<Directory>> getStorageList(storageType) async {
     if (Platform.isAndroid) {
+      Directory storages = await getApplicationDocumentsDirectory();
+      final appDefaultDirectory = Directory(p.join(storages.path, 'Home'));
+      if (await Permission.storage.request().isGranted) {
+        if (!await appDefaultDirectory.exists()) {
+          storages = await appDefaultDirectory.create();
+          return [storages];
+        }
+      } else {
+        await [Permission.storage].request();
+      }
       if (storageType == 'APP_EXT_STORAGE_DIR') {
         List<Directory> storages = (await getExternalStorageDirectories())!;
         storages = storages.map((Directory e) {
@@ -191,17 +201,7 @@ class FileManager extends StatefulWidget {
         }).toList();
       } else if (storageType == 'APP_DIR_DOC') {
         Directory storages = await getApplicationDocumentsDirectory();
-
-        final appDefaultDirectory = Directory(p.join(storages.path, 'Home'));
-        if (await Permission.storage.request().isGranted) {
-          if (!await appDefaultDirectory.exists()) {
-            storages = await appDefaultDirectory.create();
-            return [storages];
-          }
-        } else {
-          await [Permission.storage].request();
-        }
-
+        storages = Directory(p.join(storages.path, 'Home'));
         return [storages];
       }
     }
