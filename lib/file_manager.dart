@@ -19,8 +19,7 @@ class _PathStat {
   _PathStat(this.path, this.dateTime);
 }
 
-Future<List<FileSystemEntity>> _sortEntitysList(
-    String path, SortBy sortType) async {
+Future<List<FileSystemEntity>> _sortEntitysList(String path, SortBy sortType) async {
   final List<FileSystemEntity> list = await Directory(path).list().toList();
   if (sortType == SortBy.name) {
     // making list of only folders.
@@ -46,9 +45,8 @@ Future<List<FileSystemEntity>> _sortEntitysList(
     _pathStat.sort((b, a) => a.dateTime.compareTo(b.dateTime));
 
     // sorting [list] accroding to [_pathStat]
-    list.sort((a, b) => _pathStat
-        .indexWhere((element) => element.path == a.path)
-        .compareTo(_pathStat.indexWhere((element) => element.path == b.path)));
+    list.sort(
+        (a, b) => _pathStat.indexWhere((element) => element.path == a.path).compareTo(_pathStat.indexWhere((element) => element.path == b.path)));
     return list;
   } else if (sortType == SortBy.type) {
     // making list of only folders.
@@ -61,11 +59,7 @@ Future<List<FileSystemEntity>> _sortEntitysList(
     final files = list.where((element) => element is File).toList();
 
     // sorting files list by extension.
-    files.sort((a, b) => a.path
-        .toLowerCase()
-        .split('.')
-        .last
-        .compareTo(b.path.toLowerCase().split('.').last));
+    files.sort((a, b) => a.path.toLowerCase().split('.').last.compareTo(b.path.toLowerCase().split('.').last));
     return [...dirs, ...files];
   } else if (sortType == SortBy.size) {
     // create list of path and size
@@ -87,10 +81,8 @@ Future<List<FileSystemEntity>> _sortEntitysList(
     _sizeMapList.sort((b, a) => a.value.compareTo(b.value));
 
     // sort [list] according to [_sizeMapList]
-    files.sort((a, b) => _sizeMapList
-        .indexWhere((element) => element.key == a.path)
-        .compareTo(
-            _sizeMapList.indexWhere((element) => element.key == b.path)));
+    files.sort(
+        (a, b) => _sizeMapList.indexWhere((element) => element.key == a.path).compareTo(_sizeMapList.indexWhere((element) => element.key == b.path)));
     return [...dirs, ...files];
   }
   return [];
@@ -205,12 +197,9 @@ class FileManager extends StatefulWidget {
     if (entity is Directory) {
       return entity.path.split('/').last;
     } else if (entity is File) {
-      return (showFileExtension)
-          ? entity.path.split('/').last.split('.').first
-          : entity.path.split('/').last;
+      return (showFileExtension) ? entity.path.split('/').last.split('.').first : entity.path.split('/').last;
     } else {
-      print(
-          "Please provide a Object of type File, Directory or FileSystemEntity");
+      print("Please provide a Object of type File, Directory or FileSystemEntity");
       return "";
     }
   }
@@ -233,7 +222,7 @@ class FileManager extends StatefulWidget {
   }
 
   /// Return file extension as String.
-  /// 
+  ///
   /// ie:- `File("/../image.png")` to `"png"`
   static String getFileExtension(FileSystemEntity file) {
     if (file is File) {
@@ -247,15 +236,13 @@ class FileManager extends StatefulWidget {
   /// returns an empty list if there is no storage
   static Future<List<Directory>> getStorageList() async {
     if (Platform.isAndroid) {
-      List<Directory> storages = (await getExternalStorageDirectories())!;
+      /*  List<Directory> storages = (await getExternalStorageDirectories())!;
       storages = storages.map((Directory e) {
         final List<String> splitedPath = e.path.split("/");
-        return Directory(splitedPath
-            .sublist(
-                0, splitedPath.indexWhere((element) => element == "Android"))
-            .join("/"));
-      }).toList();
-      return storages;
+        return Directory(splitedPath.sublist(0, splitedPath.indexWhere((element) => element == "Android")).join("/"));
+      }).toList(); */
+      Directory storages = await getApplicationDocumentsDirectory();
+      return [storages];
     } else if (Platform.isLinux) {
       final Directory dir = await getApplicationDocumentsDirectory();
 
@@ -303,8 +290,7 @@ class _FileManagerState extends State<FileManager> {
             valueListenable: widget.controller.getSortedByNotifier,
             builder: (context, snapshot, _) {
               return FutureBuilder<List<FileSystemEntity>>(
-                  future: _sortEntitysList(pathSnapshot,
-                      widget.controller.getSortedByNotifier.value),
+                  future: _sortEntitysList(pathSnapshot, widget.controller.getSortedByNotifier.value),
                   builder: (context, snapshot) {
                     if (snapshot.hasData) {
                       List<FileSystemEntity> entitys = snapshot.data!;
@@ -313,8 +299,7 @@ class _FileManagerState extends State<FileManager> {
                       }
                       if (widget.hideHiddenEntity) {
                         entitys = entitys.where((element) {
-                          if (FileManager.basename(element) == "" ||
-                              FileManager.basename(element).startsWith('.')) {
+                          if (FileManager.basename(element) == "" || FileManager.basename(element).startsWith('.')) {
                             return false;
                           } else {
                             return true;
