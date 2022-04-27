@@ -2,8 +2,10 @@ library file_manager;
 
 import 'dart:io';
 import 'dart:math' as math;
+import 'package:path/path.dart' as p;
 import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 import 'package:file_manager/helper/helper.dart';
 export 'package:file_manager/helper/helper.dart';
@@ -88,39 +90,6 @@ Future<List<FileSystemEntity>> _sortEntitysList(String path, SortBy sortType) as
   return [];
 }
 
-/// FileManager is a wonderful widget that allows you to manage files and folders, pick files and folders, and do a lot more.
-/// Designed to feel like part of the Flutter framework.
-///
-/// Sample code
-///```dart
-///FileManager(
-///    controller: controller,
-///    builder: (context, snapshot) {
-///    final List<FileSystemEntity> entitis = snapshot;
-///      return ListView.builder(
-///        itemCount: entitis.length,
-///        itemBuilder: (context, index) {
-///          return Card(
-///            child: ListTile(
-///              leading: FileManager.isFile(entitis[index])
-///                  ? Icon(Icons.feed_outlined)
-///                  : Icon(Icons.folder),
-///              title: Text(FileManager.basename(entitis[index])),
-///              onTap: () {
-///                if (FileManager.isDirectory(entitis[index])) {
-///                    controller
-///                     .openDirectory(entitis[index]);
-///                  } else {
-///                      // Perform file-related tasks.
-///                  }
-///              },
-///            ),
-///          );
-///        },
-///      );
-///  },
-///),
-///```
 class FileManager extends StatefulWidget {
   /// For the loading screen, create a custom widget.
   /// Simple Centered CircularProgressIndicator is provided by default.
@@ -132,30 +101,6 @@ class FileManager extends StatefulWidget {
   ///Controls the state of the FileManager.
   final FileManagerController controller;
 
-  ///This function allows you to create custom widgets and retrieve a list of entities `List<FileSystemEntity>.`
-  ///
-  ///
-  ///```
-  /// builder: (context, snapshot) {
-  ///               return ListView.builder(
-  ///                 itemCount: snapshot.length,
-  ///                 itemBuilder: (context, index) {
-  ///                   return Card(
-  ///                     child: ListTile(
-  ///                       leading: FileManager.isFile(snapshot[index])
-  ///                           ? Icon(Icons.feed_outlined)
-  ///                           : Icon(Icons.folder),
-  ///                       title: Text(FileManager.basename(snapshot[index])),
-  ///                       onTap: () {
-  ///                         if (FileManager.isDirectory(snapshot[index]))
-  ///                           controller.openDirectory(snapshot[index]);
-  ///                       },
-  ///                     ),
-  ///                   );
-  ///                 },
-  ///               );
-  ///             },
-  /// ```
   final _Builder builder;
 
   /// Hide the files and folders that are hidden.
@@ -234,24 +179,31 @@ class FileManager extends StatefulWidget {
 
   /// Get list of available storage in the device
   /// returns an empty list if there is no storage
-  static Future<List<Directory>> getStorageList() async {
+  /// APP_DIR_DOC -> getApplicationDocumentsDirectory()
+  /// APP_EXT_STORAGE_DIR -> getExternalStorageDirectories()
+  static Future<List<Directory>> getStorageList(storageType) async {
     if (Platform.isAndroid) {
-      /*  List<Directory> storages = (await getExternalStorageDirectories())!;
-      storages = storages.map((Directory e) {
-        final List<String> splitedPath = e.path.split("/");
-        return Directory(splitedPath.sublist(0, splitedPath.indexWhere((element) => element == "Android")).join("/"));
-      }).toList(); */
-      Directory storages = await getApplicationDocumentsDirectory();
-      return [storages];
-    } else if (Platform.isLinux) {
-      final Directory dir = await getApplicationDocumentsDirectory();
+      if (storageType == 'APP_EXT_STORAGE_DIR') {
+        List<Directory> storages = (await getExternalStorageDirectories())!;
+        storages = storages.map((Directory e) {
+          final List<String> splitedPath = e.path.split("/");
+          return Directory(splitedPath.sublist(0, splitedPath.indexWhere((element) => element == "Android")).join("/"));
+        }).toList();
+      } else if (storageType == 'APP_DIR_DOC') {
+        Directory storages = await getApplicationDocumentsDirectory();
 
-      // Gives the home directory.
-      final Directory home = dir.parent;
+        final appDefaultDirectory = Directory(p.join(storages.path, 'Home'));
+        if (await Permission.storage.request().isGranted) {
+          if (!await appDefaultDirectory.exists()) {
+            storages = await appDefaultDirectory.create();
+            return [storages];
+          }
+        } else {
+          await [Permission.storage].request();
+        }
 
-      // you may provide root directory.
-      // final Directory root = dir.parent.parent.parent;
-      return [home];
+        return [storages];
+      }
     }
     return [];
   }
@@ -267,7 +219,7 @@ class _FileManagerState extends State<FileManager> {
   @override
   Widget build(BuildContext context) {
     return FutureBuilder<List<Directory>?>(
-      future: FileManager.getStorageList(),
+      future: FileManager.getStorageList('APP_DIR_DOC'),
       builder: (context, snapshot) {
         if (snapshot.hasData) {
           widget.controller.setCurrentPath = snapshot.data!.first.path;

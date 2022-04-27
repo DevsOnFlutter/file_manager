@@ -52,16 +52,13 @@ class FileManagerController {
 
   /// return true if current directory is the root. false, if the current directory not on root of the stogare.
   Future<bool> isRootDirectory() async {
-    final List<Directory> storageList = (await FileManager.getStorageList());
-    return (storageList
-        .where((element) => element.path == Directory(_path.value).path)
-        .isNotEmpty);
+    final List<Directory> storageList = (await FileManager.getStorageList('APP_DIR_DOC'));
+    return (storageList.where((element) => element.path == Directory(_path.value).path).isNotEmpty);
   }
 
   /// Jumps to the parent directory of currently opened directory if the parent is accessible.
   Future<void> goToParentDirectory() async {
-    if (!(await isRootDirectory()))
-      openDirectory(Directory(_path.value).parent);
+    if (!(await isRootDirectory())) openDirectory(Directory(_path.value).parent);
   }
 
   /// Open directory by providing [Directory].

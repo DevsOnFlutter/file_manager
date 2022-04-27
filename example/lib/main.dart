@@ -67,40 +67,38 @@ class HomePage extends StatelessWidget {
                     FileSystemEntity entity = entities[index];
                     return Card(
                       child: ListTile(
-                        leading: FileManager.isFile(entity)
-                            ? Icon(Icons.feed_outlined)
-                            : Icon(Icons.folder),
+                        leading: FileManager.isFile(entity) ? Icon(Icons.feed_outlined) : Icon(Icons.folder),
                         title: Text(FileManager.basename(entity)),
                         subtitle: subtitle(entity),
                         onTap: () async {
                           if (FileManager.isDirectory(entity)) {
                             // open the folder
                             controller.openDirectory(entity);
-    
+
                             // delete a folder
                             // await entity.delete(recursive: true);
-    
+
                             // rename a folder
                             // await entity.rename("newPath");
-    
+
                             // Check weather folder exists
                             // entity.exists();
-    
+
                             // get date of file
                             // DateTime date = (await entity.stat()).modified;
                           } else {
                             // delete a file
                             // await entity.delete();
-    
+
                             // rename a file
                             // await entity.rename("newPath");
-    
+
                             // Check weather file exists
                             // entity.exists();
-    
+
                             // get date of file
                             // DateTime date = (await entity.stat()).modified;
-    
+
                             // get the size of the file
                             // int size = (await entity.stat()).size;
                           }
@@ -142,7 +140,7 @@ class HomePage extends StatelessWidget {
       context: context,
       builder: (context) => Dialog(
         child: FutureBuilder<List<Directory>>(
-          future: FileManager.getStorageList(),
+          future: FileManager.getStorageList('APP_DIR_DOC'),
           builder: (context, snapshot) {
             if (snapshot.hasData) {
               final List<FileSystemEntity> storageList = snapshot.data!;
@@ -232,11 +230,9 @@ class HomePage extends StatelessWidget {
                   onPressed: () async {
                     try {
                       // Create Folder
-                      await FileManager.createFolder(
-                          controller.getCurrentPath, folderName.text);
+                      await FileManager.createFolder(controller.getCurrentPath, folderName.text);
                       // Open Created Folder
-                      controller.setCurrentPath =
-                          controller.getCurrentPath + "/" + folderName.text;
+                      controller.setCurrentPath = controller.getCurrentPath + "/" + folderName.text;
                     } catch (e) {}
 
                     Navigator.pop(context);
