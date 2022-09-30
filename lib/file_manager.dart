@@ -233,7 +233,7 @@ class FileManager extends StatefulWidget {
   }
 
   /// Return file extension as String.
-  /// 
+  ///
   /// ie:- `File("/../image.png")` to `"png"`
   static String getFileExtension(FileSystemEntity file) {
     if (file is File) {
@@ -271,6 +271,8 @@ class FileManager extends StatefulWidget {
 }
 
 class _FileManagerState extends State<FileManager> {
+  Future<List<Directory>?>? currentDir;
+
   @override
   void dispose() {
     widget.controller.dispose();
@@ -278,9 +280,19 @@ class _FileManagerState extends State<FileManager> {
   }
 
   @override
+  void initState() {
+    super.initState();
+    if (widget.controller.getCurrentPath.isNotEmpty) {
+      currentDir = Future.value([widget.controller.getCurrentDirectory]);
+    } else {
+      currentDir = FileManager.getStorageList();
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
     return FutureBuilder<List<Directory>?>(
-      future: FileManager.getStorageList(),
+      future: currentDir,
       builder: (context, snapshot) {
         if (snapshot.hasData) {
           widget.controller.setCurrentPath = snapshot.data!.first.path;
