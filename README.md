@@ -12,9 +12,7 @@ Designed to feel like part of the Flutter framework.
 ✅ &nbsp; Android </br>
 ✅ &nbsp; Linux </br>
 ❌ &nbsp; Windows ([in progress](https://github.com/4-alok/file_manager/tree/windows-support))</br>
-❌ &nbsp; Web </br>
 ❌ &nbsp; MacOS (active issue: [MacOS support](https://github.com/DevsOnFlutter/file_manager/issues/8)) </br>
-❌ &nbsp; iOS (active issue: [iOS support](https://github.com/DevsOnFlutter/file_manager/issues/7)) </br>
 
 ## Usage
 
@@ -31,13 +29,17 @@ dependencies:
 
 ### Give storage permission to application
 
-**Android:** Beside needing to add **WRITE_EXTERNAL_STORAGE** and **READ_EXTERNAL_STORAGE** to your android/app/src/main/AndroidManifest.xml.
+## Android
+
+ Beside needing to add **WRITE_EXTERNAL_STORAGE** , **READ_EXTERNAL_STORAGE** and **MANAGE_EXTERNAL_STORAGE** to your android/app/src/main/AndroidManifest.xml.
 
 ```xml
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.xxx.yyy">
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.MANAGE_EXTERNAL_STORAGE" />
+
 ...
 </manifest>
 ```
@@ -47,11 +49,22 @@ also add for Android 10
 ```xml
     <application
       android:requestLegacyExternalStorage="true"   
-      ...
+      .../>
 ```
 
 **You also need Runtime Request Permission**
 allow storage permission from app setting manually or you may use any package such as [`permission_handler`](https://pub.dev/packages/permission_handler).
+
+or use `FileManager` to request permission at runtime.
+
+```dart
+  // request permission
+  await controller.requestFilesAccessPermission();
+
+  or 
+
+  await FileManager.requestFilesAccessPermission();
+```
 
 </hr>
 

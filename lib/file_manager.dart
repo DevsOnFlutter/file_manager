@@ -2,11 +2,15 @@ library file_manager;
 
 import 'dart:io';
 import 'dart:math' as math;
+import 'package:file_manager/utils/extensions.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:path_provider/path_provider.dart';
 
 import 'package:file_manager/helper/helper.dart';
 export 'package:file_manager/helper/helper.dart';
+
+const _methodChannel = MethodChannel('myapp/channel');
 
 typedef _Builder = Widget Function(
   BuildContext context,
@@ -17,90 +21,6 @@ typedef _ErrorBuilder = Widget Function(
   BuildContext context,
   Object? error,
 );
-
-class _PathStat {
-  final String path;
-  final DateTime dateTime;
-
-  _PathStat(this.path, this.dateTime);
-}
-
-Future<List<FileSystemEntity>> _sortEntitiesList(
-    String path, SortBy sortType) async {
-  final List<FileSystemEntity> list = await Directory(path).list().toList();
-  if (sortType == SortBy.name) {
-    // making list of only folders.
-    final dirs = list.where((element) => element is Directory).toList();
-    // sorting folder list by name.
-    dirs.sort((a, b) => a.path.toLowerCase().compareTo(b.path.toLowerCase()));
-
-    // making list of only flies.
-    final files = list.where((element) => element is File).toList();
-    // sorting files list by name.
-    files.sort((a, b) => a.path.toLowerCase().compareTo(b.path.toLowerCase()));
-
-    // first folders will go to list (if available) then files will go to list.
-    return [...dirs, ...files];
-  } else if (sortType == SortBy.date) {
-    // making the list of Path & DateTime
-    List<_PathStat> _pathStat = [];
-    for (FileSystemEntity e in list) {
-      _pathStat.add(_PathStat(e.path, (await e.stat()).modified));
-    }
-
-    // sort _pathStat according to date
-    _pathStat.sort((b, a) => a.dateTime.compareTo(b.dateTime));
-
-    // sorting [list] according to [_pathStat]
-    list.sort((a, b) => _pathStat
-        .indexWhere((element) => element.path == a.path)
-        .compareTo(_pathStat.indexWhere((element) => element.path == b.path)));
-    return list;
-  } else if (sortType == SortBy.type) {
-    // making list of only folders.
-    final dirs = list.where((element) => element is Directory).toList();
-
-    // sorting folders by name.
-    dirs.sort((a, b) => a.path.toLowerCase().compareTo(b.path.toLowerCase()));
-
-    // making the list of files
-    final files = list.where((element) => element is File).toList();
-
-    // sorting files list by extension.
-    files.sort((a, b) => a.path
-        .toLowerCase()
-        .split('.')
-        .last
-        .compareTo(b.path.toLowerCase().split('.').last));
-    return [...dirs, ...files];
-  } else if (sortType == SortBy.size) {
-    // create list of path and size
-    Map<String, int> _sizeMap = {};
-    for (FileSystemEntity e in list) {
-      _sizeMap[e.path] = (await e.stat()).size;
-    }
-
-    // making list of only folders.
-    final dirs = list.where((element) => element is Directory).toList();
-    // sorting folder list by name.
-    dirs.sort((a, b) => a.path.toLowerCase().compareTo(b.path.toLowerCase()));
-
-    // making list of only flies.
-    final files = list.where((element) => element is File).toList();
-
-    // creating sorted list of [_sizeMapList] by size.
-    final List<MapEntry<String, int>> _sizeMapList = _sizeMap.entries.toList();
-    _sizeMapList.sort((b, a) => a.value.compareTo(b.value));
-
-    // sort [list] according to [_sizeMapList]
-    files.sort((a, b) => _sizeMapList
-        .indexWhere((element) => element.key == a.path)
-        .compareTo(
-            _sizeMapList.indexWhere((element) => element.key == b.path)));
-    return [...dirs, ...files];
-  }
-  return [];
-}
 
 /// FileManager is a wonderful widget that allows you to manage files and folders, pick files and folders, and do a lot more.
 /// Designed to feel like part of the Flutter framework.
@@ -190,6 +110,18 @@ class FileManager extends StatefulWidget {
   @override
   _FileManagerState createState() => _FileManagerState();
 
+  static Future<void> requestFilesAccessPermission() async {
+    if (Platform.isAndroid) {
+      try {
+        await _methodChannel.invokeMethod('requestFilesAccessPermission');
+      } on PlatformException catch (e) {
+        throw e;
+      }
+    } else {
+      throw UnsupportedError('Only Android is supported');
+    }
+  }
+
   /// check weather FileSystemEntity is File
   /// return true if FileSystemEntity is File else returns false
   static bool isFile(FileSystemEntity entity) {
@@ -211,30 +143,33 @@ class FileManager extends StatefulWidget {
   /// controller.basename(dir);
   /// ```
   /// to hide the extension of file, showFileExtension = flase
-  static String basename(dynamic entity, [bool showFileExtension = true]) {
-    if (entity is Directory) {
-      return entity.path.split('/').last;
-    } else if (entity is File) {
-      return (showFileExtension)
-          ? entity.path.split('/').last.split('.').first
-          : entity.path.split('/').last;
-    } else {
-      print(
-          "Please provide a Object of type File, Directory or FileSystemEntity");
-      return "";
-    }
+  static String basename(dynamic entity, {bool showFileExtension = true}) {
+    if (entity is! FileSystemEntity) return "";
+
+    final pathSegments = entity.path.split('/');
+    final filename = pathSegments.last;
+
+    if (showFileExtension) return filename;
+
+    return showFileExtension ? filename.split('.').first : filename;
   }
 
-  /// Convert bytes to human readable size
+  static const int base = 1024;
+  static const List<String> suffix = ['B', 'KB', 'MB', 'GB', 'TB'];
+  static const List<int> powBase = [
+    1,
+    1024,
+    1048576,
+    1073741824,
+    1099511627776
+  ];
+
+  /// Format bytes to human readable string.
   static String formatBytes(int bytes, [int precision = 2]) {
-    if (bytes != 0) {
-      final double base = math.log(bytes) / math.log(1024);
-      final suffix = const ['B', 'KB', 'MB', 'GB', 'TB'][base.floor()];
-      final size = math.pow(1024, base - base.floor());
-      return '${size.toStringAsFixed(precision)} $suffix';
-    } else {
-      return "0B";
-    }
+    final base = (bytes == 0) ? 0 : (math.log(bytes) / math.log(1024)).floor();
+    final size = bytes / powBase[base];
+    final formattedSize = size.toStringAsFixed(precision);
+    return '$formattedSize ${suffix[base]}';
   }
 
   /// Creates the directory if it doesn't exist.
@@ -299,6 +234,20 @@ class _FileManagerState extends State<FileManager> {
     }
   }
 
+  Future<List<FileSystemEntity>> entityList(String path, SortBy sortBy) async {
+    List<FileSystemEntity> entitys = await Directory(path).list().toList();
+    switch (sortBy) {
+      case SortBy.name:
+        return entitys.sortByName;
+      case SortBy.size:
+        return entitys.sortBySize;
+      case SortBy.date:
+        return entitys.sortByDate;
+      case SortBy.type:
+        return entitys.sortByType;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return FutureBuilder<List<Directory>?>(
@@ -325,7 +274,7 @@ class _FileManagerState extends State<FileManager> {
             valueListenable: widget.controller.getSortedByNotifier,
             builder: (context, snapshot, _) {
               return FutureBuilder<List<FileSystemEntity>>(
-                  future: _sortEntitiesList(pathSnapshot,
+                  future: entityList(pathSnapshot,
                       widget.controller.getSortedByNotifier.value),
                   builder: (context, snapshot) {
                     if (snapshot.hasData) {
@@ -410,11 +359,9 @@ class _FileManagerState extends State<FileManager> {
 /// )
 /// ```
 class ControlBackButton extends StatelessWidget {
-  const ControlBackButton({
-    required this.child,
-    required this.controller,
-    Key? key,
-  }) : super(key: key);
+  const ControlBackButton(
+      {required this.child, required this.controller, Key? key})
+      : super(key: key);
 
   final Widget child;
   final FileManagerController controller;
