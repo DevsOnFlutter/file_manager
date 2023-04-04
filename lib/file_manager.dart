@@ -13,13 +13,19 @@ typedef _Builder = Widget Function(
   List<FileSystemEntity> snapshot,
 );
 
+typedef _ErrorBuilder = Widget Function(
+  BuildContext context,
+  Object? error,
+);
+
 class _PathStat {
   final String path;
   final DateTime dateTime;
+
   _PathStat(this.path, this.dateTime);
 }
 
-Future<List<FileSystemEntity>> _sortEntitysList(
+Future<List<FileSystemEntity>> _sortEntitiesList(
     String path, SortBy sortType) async {
   final List<FileSystemEntity> list = await Directory(path).list().toList();
   if (sortType == SortBy.name) {
@@ -45,7 +51,7 @@ Future<List<FileSystemEntity>> _sortEntitysList(
     // sort _pathStat according to date
     _pathStat.sort((b, a) => a.dateTime.compareTo(b.dateTime));
 
-    // sorting [list] accroding to [_pathStat]
+    // sorting [list] according to [_pathStat]
     list.sort((a, b) => _pathStat
         .indexWhere((element) => element.path == a.path)
         .compareTo(_pathStat.indexWhere((element) => element.path == b.path)));
@@ -137,6 +143,9 @@ class FileManager extends StatefulWidget {
   /// For an empty screen, create a custom widget.
   final Widget? emptyFolder;
 
+  /// For an error screen, create a custom widget.
+  final _ErrorBuilder? errorBuilder;
+
   ///Controls the state of the FileManager.
   final FileManagerController controller;
 
@@ -172,6 +181,7 @@ class FileManager extends StatefulWidget {
   FileManager({
     this.emptyFolder,
     this.loadingScreen,
+    this.errorBuilder,
     required this.controller,
     required this.builder,
     this.hideHiddenEntity = true,
@@ -299,7 +309,7 @@ class _FileManagerState extends State<FileManager> {
           return _body(context);
         } else if (snapshot.hasError) {
           print(snapshot.error);
-          return _errorPage(snapshot.error.toString());
+          return _errorPage(context, snapshot.error);
         } else {
           return _loadingScreenWidget();
         }
@@ -315,13 +325,13 @@ class _FileManagerState extends State<FileManager> {
             valueListenable: widget.controller.getSortedByNotifier,
             builder: (context, snapshot, _) {
               return FutureBuilder<List<FileSystemEntity>>(
-                  future: _sortEntitysList(pathSnapshot,
+                  future: _sortEntitiesList(pathSnapshot,
                       widget.controller.getSortedByNotifier.value),
                   builder: (context, snapshot) {
                     if (snapshot.hasData) {
                       List<FileSystemEntity> entitys = snapshot.data!;
                       if (entitys.length == 0) {
-                        return _emptyFolderWidger();
+                        return _emptyFolderWidget();
                       }
                       if (widget.hideHiddenEntity) {
                         entitys = entitys.where((element) {
@@ -336,7 +346,7 @@ class _FileManagerState extends State<FileManager> {
                       return widget.builder(context, entitys);
                     } else if (snapshot.hasError) {
                       print(snapshot.error);
-                      return _errorPage(snapshot.error.toString());
+                      return _errorPage(context, snapshot.error);
                     } else {
                       return _loadingScreenWidget();
                     }
@@ -346,7 +356,7 @@ class _FileManagerState extends State<FileManager> {
     );
   }
 
-  Widget _emptyFolderWidger() {
+  Widget _emptyFolderWidget() {
     if (widget.emptyFolder == null) {
       return Container(
         child: Center(child: Text("Empty Directory")),
@@ -355,7 +365,10 @@ class _FileManagerState extends State<FileManager> {
       return widget.emptyFolder!;
   }
 
-  Container _errorPage(String error) {
+  Widget _errorPage(BuildContext context, Object? error) {
+    if (widget.errorBuilder != null) {
+      return widget.errorBuilder!(context, error);
+    }
     return Container(
       color: Colors.red,
       child: Center(
@@ -405,6 +418,7 @@ class ControlBackButton extends StatelessWidget {
 
   final Widget child;
   final FileManagerController controller;
+
   @override
   Widget build(BuildContext context) {
     return WillPopScope(
