@@ -9,7 +9,7 @@ repository: https://github.com/DevsOnFlutter/file_manager
 documentation: https://github.com/DevsOnFlutter/file_manager/blob/main/README.md
 
 environment:
-  sdk: ">=2.12.0 <3.0.0"
+  sdk: ">=2.12.0 <4.0.0"
 
 dependencies:
   flutter:

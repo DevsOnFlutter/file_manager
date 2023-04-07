@@ -59,10 +59,6 @@ or use `FileManager` to request permission at runtime.
 
 ```dart
   // request permission
-  await controller.requestFilesAccessPermission();
-
-  or 
-
   await FileManager.requestFilesAccessPermission();
 ```
 
