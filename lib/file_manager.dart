@@ -234,8 +234,11 @@ class _FileManagerState extends State<FileManager> {
     }
   }
 
-  Future<List<FileSystemEntity>> entityList(String path, SortBy sortBy) async {
-    List<FileSystemEntity> entitys = await Directory(path).list().toList();
+  Future<List<FileSystemEntity>> entityList(
+      String path, SortBy sortBy, bool refresh) async {
+    List<FileSystemEntity> entitys = refresh
+        ? await Directory(path).list().toList()
+        : await Directory(path).list().toList();
     switch (sortBy) {
       case SortBy.name:
         return entitys.sortByName;
@@ -273,32 +276,39 @@ class _FileManagerState extends State<FileManager> {
         return ValueListenableBuilder<SortBy>(
             valueListenable: widget.controller.getSortedByNotifier,
             builder: (context, snapshot, _) {
-              return FutureBuilder<List<FileSystemEntity>>(
-                  future: entityList(pathSnapshot,
-                      widget.controller.getSortedByNotifier.value),
-                  builder: (context, snapshot) {
-                    if (snapshot.hasData) {
-                      List<FileSystemEntity> entitys = snapshot.data!;
-                      if (entitys.length == 0) {
-                        return _emptyFolderWidget();
-                      }
-                      if (widget.hideHiddenEntity) {
-                        entitys = entitys.where((element) {
-                          if (FileManager.basename(element) == "" ||
-                              FileManager.basename(element).startsWith('.')) {
-                            return false;
+              return ValueListenableBuilder<bool>(
+                  valueListenable: widget.controller.getRefreshNotifier,
+                  builder: (context, refreshSnapshot, _) {
+                    return FutureBuilder<List<FileSystemEntity>>(
+                        future: entityList(
+                            pathSnapshot,
+                            widget.controller.getSortedByNotifier.value,
+                            refreshSnapshot),
+                        builder: (context, snapshot) {
+                          if (snapshot.hasData) {
+                            List<FileSystemEntity> entitys = snapshot.data!;
+                            if (entitys.length == 0) {
+                              return _emptyFolderWidget();
+                            }
+                            if (widget.hideHiddenEntity) {
+                              entitys = entitys.where((element) {
+                                if (FileManager.basename(element) == "" ||
+                                    FileManager.basename(element)
+                                        .startsWith('.')) {
+                                  return false;
+                                } else {
+                                  return true;
+                                }
+                              }).toList();
+                            }
+                            return widget.builder(context, entitys);
+                          } else if (snapshot.hasError) {
+                            print(snapshot.error);
+                            return _errorPage(context, snapshot.error);
                           } else {
-                            return true;
+                            return _loadingScreenWidget();
                           }
-                        }).toList();
-                      }
-                      return widget.builder(context, entitys);
-                    } else if (snapshot.hasError) {
-                      print(snapshot.error);
-                      return _errorPage(context, snapshot.error);
-                    } else {
-                      return _loadingScreenWidget();
-                    }
+                        });
                   });
             });
       },

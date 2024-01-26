@@ -5,10 +5,15 @@ import 'package:flutter/widgets.dart';
 class FileManagerController {
   final ValueNotifier<String> _path = ValueNotifier<String>('');
   final ValueNotifier<SortBy> _short = ValueNotifier<SortBy>(SortBy.name);
+  final ValueNotifier<bool> _refresh = ValueNotifier<bool>(false);
 
   _updatePath(String path) {
     _path.value = path;
     titleNotifier.value = path.split('/').last;
+  }
+
+  void refresh() {
+    _refresh.value = !_refresh.value;
   }
 
   /// ValueNotifier of the current directory's basename
@@ -26,6 +31,7 @@ class FileManagerController {
 
   /// Get ValueNotifier of path
   ValueNotifier<String> get getPathNotifier => _path;
+  ValueNotifier<bool> get getRefreshNotifier => _refresh;
 
   /// Get ValueNotifier of SortedBy
   ValueNotifier<SortBy> get getSortedByNotifier => _short;
