@@ -230,7 +230,11 @@ class _FileManagerState extends State<FileManager> {
     if (widget.controller.getCurrentPath.isNotEmpty) {
       currentDir = Future.value([widget.controller.getCurrentDirectory]);
     } else {
-      currentDir = FileManager.getStorageList();
+      currentDir = Future(() async {
+        final list = await FileManager.getStorageList();
+        widget.controller.setCurrentPath = list.first.path;
+        return [widget.controller.getCurrentDirectory];
+      });
     }
   }
 
@@ -254,7 +258,6 @@ class _FileManagerState extends State<FileManager> {
       future: currentDir,
       builder: (context, snapshot) {
         if (snapshot.hasData) {
-          widget.controller.setCurrentPath = snapshot.data!.first.path;
           return _body(context);
         } else if (snapshot.hasError) {
           print(snapshot.error);
